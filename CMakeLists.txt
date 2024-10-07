@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.22.1)
 project(imtool LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -42,3 +42,7 @@ add_subdirectory(utest−imgaos)
 add_subdirectory(utest−imgsoa)
 add_subdirectory(ftest−aos)
 add_subdirectory(ftest−soa)
+
+set(CMAKE_CXX_CLANG_TIDY clang−tidy;
+        −format−style=file;
+        −header−filter=.;)
