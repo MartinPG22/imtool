@@ -5,8 +5,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-#include "common/progargs.hpp" // Este archivo contendría las funciones comunes
-#include "imgaos/imageaos.hpp" // Librería específica de AOS para manipulación de imágenes
+
 
 void printUsage() {
     std::cerr << "Usage: imtool <input_path> <output_path> <operation> [<additional_args>...]" << std::endl;
