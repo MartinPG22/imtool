@@ -33,15 +33,15 @@ include_directories (PUBLIC .)
 add_subdirectory(common)
 add_subdirectory(imgaos)
 add_subdirectory(imgsoa)
-add_subdirectory(imtool−aos)
-add_subdirectory(imtool−soa)
+add_subdirectory(imtool-aos)
+add_subdirectory(imtool-soa)
 # Unit tests and functional tests
 enable_testing()
-add_subdirectory(utest−common)
-add_subdirectory(utest−imgaos)
-add_subdirectory(utest−imgsoa)
-add_subdirectory(ftest−aos)
-add_subdirectory(ftest−soa)
+add_subdirectory(utest-common)
+add_subdirectory(utest-imgaos)
+add_subdirectory(utest-imagsoa)
+add_subdirectory(ftest-aos)
+add_subdirectory(ftest-soa)
 
 set(CMAKE_CXX_CLANG_TIDY clang−tidy;
         −format−style=file;
