@@ -5,7 +5,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "../common/progargs.hpp"  // Incluir la cabecera de la función
+#include <span>
+#include "../common/progargs.cpp"  // Incluir la cabecera de la función
 
 /*
  int main(int argc, char* argv[]) {
