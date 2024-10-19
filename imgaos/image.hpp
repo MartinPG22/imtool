@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <cstdint>
-
+/*
 struct Pixel {
   uint16_t red;
   uint16_t green;
@@ -21,4 +21,5 @@ struct ImageAOS {
     pixels.resize(width * height);
   }
 };
+*/
 #endif //IMAGE_HPP

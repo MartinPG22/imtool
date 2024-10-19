@@ -2,6 +2,9 @@
 //
 // Created by mapor on 07/10/2024.
 //
+#include "binaryio.hpp"
+
+#include "binaryio.cpp"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -42,11 +45,20 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
             return -1;
         }
         //execute modulo para el info
-        std::cout << "Executing 'info' operation on: " << inputPath << std::endl;
+        std::cout << "(DEPURACION) Executing 'info' operation on: " << inputPath << std::endl;
         if (method == "aos") {
-            std::cout << "Executing 'info' operation on: " << inputPath << std::endl;}
-        //Llamar a la función info que deberia estar en image.cpp
-
+            PPMMetadata metadata = readPPMMetadata(inputPath);
+            std::cout << "Width: " << metadata.width << std::endl;
+            std::cout << "Height: " << metadata.height << std::endl;
+            std::cout << "Max value: " << metadata.max_value << std::endl;
+        } else if (method == "soa") {
+            PPMMetadata metadata = readPPMMetadata(inputPath);
+            std::cout << "Width: " << metadata.width << std::endl;
+            std::cout << "Height: " << metadata.height << std::endl;
+            std::cout << "Max value: " << metadata.max_value << std::endl;
+        }
+        // se puede eliminar este if para el info ya que se hace antes de la conversión de las imagenes a soa o aos
+        // lo pongo ya que de momento no se usa el method en ningun lado, en el resto de funciones se deberia de usar
 
     } else if (operation == "maxlevel") {
         if (arguments.size() != 4) {
