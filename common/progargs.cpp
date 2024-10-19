@@ -6,12 +6,14 @@
 #include <string>
 #include <vector>
 #include <regex>
+#include <filesystem>  // Para trabajar con rutas de archivo
 
 
 bool isInteger(const std::string& s) {
     return std::regex_match(s, std::regex("-?[0-9]+"));
 }
-int executeOperation(const std::vector<std::string>& arguments) {
+
+int executeOperation(const std::vector<std::string>& arguments,const std::string& method) {
     if (arguments.size() <3) {
         std::cerr << "Error: Invalid number of arguments: " << arguments.size() << std::endl;
         return -1;
@@ -20,6 +22,7 @@ int executeOperation(const std::vector<std::string>& arguments) {
     std::string outputPath = arguments[1];
     std::string operation = arguments[2];
 
+
     if (operation != "info" && operation != "maxlevel" && operation != "resize" && operation != "cutfreq" && operation != "compress") {
         std::cerr << "Error: Invalid operation: " << operation << std::endl;
         return -1;
@@ -27,6 +30,7 @@ int executeOperation(const std::vector<std::string>& arguments) {
 
     std::vector<std::string> copia_arg;
     copia_arg.assign(arguments.begin()+3, arguments.end());
+
 
     if (operation == "info") {
         if (arguments.size() != 3) {
@@ -39,6 +43,10 @@ int executeOperation(const std::vector<std::string>& arguments) {
         }
         //execute modulo para el info
         std::cout << "Executing 'info' operation on: " << inputPath << std::endl;
+        if (method == "aos") {
+            std::cout << "Executing 'info' operation on: " << inputPath << std::endl;}
+        //Llamar a la función info que deberia estar en image.cpp
+
 
     } else if (operation == "maxlevel") {
         if (arguments.size() != 4) {

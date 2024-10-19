@@ -4,6 +4,7 @@ add_library(common
         binaryio.cpp
         other_2.cpp
         progargs.hpp
+        binaryio.hpp
 )
 # Use this line only if you have dependencies from this library to GSL
 find_package(GSL REQUIRED)
