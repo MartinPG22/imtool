@@ -3,8 +3,10 @@
 // Created by mapor on 07/10/2024.
 //
 #include "binaryio.hpp"
-
 #include "binaryio.cpp"
+#include "./imgaos/imageaos.hpp"
+#include "./imgaos/imageaos.cpp"
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -33,8 +35,11 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
 
     std::vector<std::string> copia_arg;
     copia_arg.assign(arguments.begin()+3, arguments.end());
-
-
+    PPMMetadata metadata = readPPMMetadata(inputPath);
+    /* (DEPURACIÓN PARA COMPROBAR QUE SE TRANSFORMAN BIEN EN AOS)
+    ImageAOS imagen = cargarImagenPPM(inputPath, metadata);
+    imprimirPixeles(imagen, metadata);
+    */
     if (operation == "info") {
         if (arguments.size() != 3) {
             std::cerr << "Error: Invalid extra arguments for info: ";
@@ -47,12 +52,10 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
         //execute modulo para el info
         std::cout << "(DEPURACION) Executing 'info' operation on: " << inputPath << std::endl;
         if (method == "aos") {
-            PPMMetadata metadata = readPPMMetadata(inputPath);
             std::cout << "Width: " << metadata.width << std::endl;
             std::cout << "Height: " << metadata.height << std::endl;
             std::cout << "Max value: " << metadata.max_value << std::endl;
         } else if (method == "soa") {
-            PPMMetadata metadata = readPPMMetadata(inputPath);
             std::cout << "Width: " << metadata.width << std::endl;
             std::cout << "Height: " << metadata.height << std::endl;
             std::cout << "Max value: " << metadata.max_value << std::endl;
