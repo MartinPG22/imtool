@@ -11,6 +11,8 @@
 #include <regex>
 #include <filesystem>  // Para trabajar con rutas de archivo
 
+#include "../imgaos/maxlevel.cpp"
+
 
 bool isInteger(const std::string& s) {
     return std::regex_match(s, std::regex("-?[0-9]+"));
@@ -76,7 +78,7 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
             return -1;
         }
         std::cout << "Executing 'maxlevel' operation with level on: " << inputPath << std::endl;
-
+        maxlevel();
     } else if (operation == "resize") {
         if (arguments.size() != 5) {
             std::cerr << "Error: Invalid number of extra arguments for resize: "<< arguments.size()-3 << std::endl;
