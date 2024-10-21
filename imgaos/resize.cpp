@@ -147,6 +147,6 @@ ImageAOS resize(const ImageAOS& srcImage, const PPMMetadata& metadata, size_t ne
 
     outFile.close();
     std::cout << "La imagen con el nuevo nivel máximo de intensidad se ha guardado en outputresize.ppm." << std::endl;
-
+    //
     return dstImage;
 }

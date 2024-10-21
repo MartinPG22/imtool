@@ -76,4 +76,4 @@ void imprimirPixeles(const ImageAOS& imagen, PPMMetadata& metadata) {
             std::cout << "\n";
         }
     }
-}
+}//

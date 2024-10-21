@@ -126,7 +126,7 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
         std::cout << "(Depuracion) He pasado las condiciones de parametros " << inputPath << std::endl;
         size_t newWidth = std::stoul(arguments[3]);
         size_t newHeight = std::stoul(arguments[4]);
-
+        //
         std::cout << "(Depuration) Executing 'resize' operation on: " << inputPath << std::endl;
         if (method == "aos") {
             ImageAOS resizedImage = resize(imagensrc, metadata, newWidth, newHeight);
