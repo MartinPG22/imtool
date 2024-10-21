@@ -54,13 +54,17 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
         //execute modulo para el info
         std::cout << "(DEPURACION) Executing 'info' operation on: " << inputPath << std::endl;
         if (method == "aos") {
-            std::cout << "Width: " << metadata.width << std::endl;
-            std::cout << "Height: " << metadata.height << std::endl;
-            std::cout << "Max value: " << metadata.max_value << std::endl;
+            std::cout << "Input: " << inputPath << std::endl;
+            std::cout << "Out: " << outputPath << std::endl;
+            std::cout << "Operation: " << operation << std::endl;
+            std::cout << "Image size: " << metadata.height << "x"<< metadata.width << std::endl;
+            std::cout << "Max level: " << metadata.max_value << std::endl;
         } else if (method == "soa") {
-            std::cout << "Width: " << metadata.width << std::endl;
-            std::cout << "Height: " << metadata.height << std::endl;
-            std::cout << "Max value: " << metadata.max_value << std::endl;
+            std::cout << "Input: " << inputPath << std::endl;
+            std::cout << "Out: " << outputPath << std::endl;
+            std::cout << "Operation: " << operation << std::endl;
+            std::cout << "Image size: " << metadata.height << "x"<< metadata.width << std::endl;
+            std::cout << "Max level: " << metadata.max_value << std::endl;
         }
         // se puede eliminar este if para el info ya que se hace antes de la conversión de las imagenes a soa o aos
         // lo pongo ya que de momento no se usa el method en ningun lado, en el resto de funciones se deberia de usar
