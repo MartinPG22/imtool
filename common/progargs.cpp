@@ -14,6 +14,7 @@
 #include <filesystem>  // Para trabajar con rutas de archivo
 
 #include "../imgaos/maxlevel.cpp"
+#include "../imgaos/resize.cpp"
 
 
 bool isInteger(const std::string& s) {
@@ -37,11 +38,13 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
 
     std::vector<std::string> copia_arg;
     copia_arg.assign(arguments.begin()+3, arguments.end());
+
     PPMMetadata metadata = readPPMMetadata(inputPath);
+    ImageAOS imagensrc = cargarImagenPPM(inputPath, metadata);
     /* (DEPURACIÓN PARA COMPROBAR QUE SE TRANSFORMAN BIEN EN AOS)
-    ImageAOS imagen = cargarImagenPPM(inputPath, metadata);
     imprimirPixeles(imagen, metadata);
     */
+    std::cout << "(Depuracion) Llego aqui " << inputPath << std::endl;
     if (operation == "info") {
         if (arguments.size() != 3) {
             std::cerr << "Error: Invalid extra arguments for info: ";
@@ -87,6 +90,7 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
         std::cout << "Executing 'maxlevel' operation with level on: " << inputPath << std::endl;
         maxlevel();
     } else if (operation == "resize") {
+        std::cout << "(Depuracion) Llego al resize " << inputPath << std::endl;
         if (arguments.size() != 5) {
             std::cerr << "Error: Invalid number of extra arguments for resize: "<< arguments.size()-3 << std::endl;
             return -1;
@@ -119,8 +123,14 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
             std::cerr << "Error: Invalid resize height: " << arguments[4] << std::endl;
             return -1;
         }
+        std::cout << "(Depuracion) He pasado las condiciones de parametros " << inputPath << std::endl;
+        size_t newWidth = std::stoul(arguments[3]);
+        size_t newHeight = std::stoul(arguments[4]);
 
-        std::cout << "Executing 'resize' operation on: " << inputPath << std::endl;
+        std::cout << "(Depuration) Executing 'resize' operation on: " << inputPath << std::endl;
+        if (method == "aos") {
+            ImageAOS resizedImage = resize(imagensrc, metadata, newWidth, newHeight);
+        }
 
     } else if (operation == "cutfreq") {
         if (arguments.size() != 4) {
