@@ -11,7 +11,6 @@
 #include <variant>
 #include <string>
 
-// Función para cargar la imagen PPM y transformarla a AOS
 ImageAOS cargarImagenPPM(const std::string& nombre_archivo, PPMMetadata& metadata) {
     std::ifstream archivo(nombre_archivo, std::ios::binary);
     if (!archivo) {
@@ -19,13 +18,23 @@ ImageAOS cargarImagenPPM(const std::string& nombre_archivo, PPMMetadata& metadat
         return {};
     }
 
-    ImageAOS imagen;
+    // Leer el tipo de magia
+    std::string magicNumber;
+    archivo >> magicNumber;
+    if (magicNumber != "P6") {
+        std::cerr << "Error: Formato no soportado." << std::endl;
+        return {};
+    }
 
+    // Leer dimensiones y valor máximo
+    archivo >> metadata.width >> metadata.height >> metadata.max_value;
+    archivo.ignore(); // Ignorar el salto de línea después del encabezado
+
+    ImageAOS imagen;
     size_t num_pixels = metadata.width * metadata.height;
 
     // Leer los píxeles en función del valor máximo
     if (metadata.max_value <= 255) {
-        // Caso: 1 byte por componente (RGB) -> max_value <= 255
         std::vector<Pixel8> pixels8(num_pixels);
         for (auto& px : pixels8) {
             archivo.read(reinterpret_cast<char*>(&px.r), 1);
@@ -34,7 +43,6 @@ ImageAOS cargarImagenPPM(const std::string& nombre_archivo, PPMMetadata& metadat
         }
         imagen.pixels = std::move(pixels8);
     } else {
-        // Caso: 2 bytes por componente (RGB) -> max_value > 255
         std::vector<Pixel16> pixels16(num_pixels);
         for (auto& px : pixels16) {
             archivo.read(reinterpret_cast<char*>(&px.r), 2);
@@ -46,6 +54,7 @@ ImageAOS cargarImagenPPM(const std::string& nombre_archivo, PPMMetadata& metadat
 
     return imagen;
 }
+
 
 void imprimirPixeles(const ImageAOS& imagen, PPMMetadata& metadata) {
     // Determinamos si los píxeles son de tipo Pixel8 o Pixel16

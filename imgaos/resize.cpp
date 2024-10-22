@@ -120,7 +120,7 @@ ImageAOS resize(const ImageAOS& srcImage, const PPMMetadata& metadata, size_t ne
     }
 
     // Guardar el vector de píxeles en un nuevo archivo PPM
-    std::ofstream outFile("imagesPPM/outputresize.ppm", std::ios::binary);
+    std::ofstream outFile("imagesPPM/outputresizeprueba.ppm", std::ios::binary);
     if (!outFile.is_open()) {
         std::cerr << "No se pudo abrir el archivo de salida" << std::endl;
         return dstImage; // Es bueno retornar el dstImage incluso si hubo un error
@@ -134,7 +134,18 @@ ImageAOS resize(const ImageAOS& srcImage, const PPMMetadata& metadata, size_t ne
             outFile.write(reinterpret_cast<const char*>(&pixel.r), 1);
             outFile.write(reinterpret_cast<const char*>(&pixel.g), 1);
             outFile.write(reinterpret_cast<const char*>(&pixel.b), 1);
+
+            // Imprimir los resultados de las 3 primeras iteraciones
+            static int count = 0; // Contador estático para mantener el estado entre iteraciones
+            if (count < 10) {
+                std::cout << "Pixel " << count + 1 << ": ("
+                          << reinterpret_cast<const char*>(&pixel.r) << ", "
+                          << reinterpret_cast<const char*>(&pixel.g) << ", "
+                          << reinterpret_cast<const char*>(&pixel.b) << ")\n";
+                count++; // Incrementar el contador
+            }
         }
+
     } else if (std::holds_alternative<std::vector<Pixel16>>(dstImage.pixels)) {
         outFile << "P6\n" << newWidth << " " << newHeight << "\n" << 65535 << "\n"; // Para Pixel16
         const auto& dstPixels = std::get<std::vector<Pixel16>>(dstImage.pixels);
