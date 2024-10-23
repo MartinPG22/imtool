@@ -43,11 +43,23 @@ ImageAOS cargarImagenPPM(const std::string& nombre_archivo, PPMMetadata& metadat
         }
         imagen.pixels = std::move(pixels8);
     } else {
+        // Caso: 2 bytes por componente (RGB) en formato little-endian
         std::vector<Pixel16> pixels16(num_pixels);
         for (auto& px : pixels16) {
-            archivo.read(reinterpret_cast<char*>(&px.r), 2);
-            archivo.read(reinterpret_cast<char*>(&px.g), 2);
-            archivo.read(reinterpret_cast<char*>(&px.b), 2);
+            // Leer los dos bytes en little-endian y combinarlos correctamente
+            uint8_t byte1, byte2;
+
+            archivo.read(reinterpret_cast<char*>(&byte1), 1); // Primer byte del rojo
+            archivo.read(reinterpret_cast<char*>(&byte2), 1); // Segundo byte del rojo
+            px.r = static_cast<uint16_t>(byte1 | (byte2 << 8)); // Combinar bytes en little-endian
+
+            archivo.read(reinterpret_cast<char*>(&byte1), 1); // Primer byte del verde
+            archivo.read(reinterpret_cast<char*>(&byte2), 1); // Segundo byte del verde
+            px.g = static_cast<uint16_t>(byte1 | (byte2 << 8)); // Combinar bytes en little-endian
+
+            archivo.read(reinterpret_cast<char*>(&byte1), 1); // Primer byte del azul
+            archivo.read(reinterpret_cast<char*>(&byte2), 1); // Segundo byte del azul
+            px.b = static_cast<uint16_t>(byte1 | (byte2 << 8)); // Combinar bytes en little-endian
         }
         imagen.pixels = std::move(pixels16);
     }
