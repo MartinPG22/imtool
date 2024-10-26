@@ -16,7 +16,7 @@ struct Pixel16 {
 };
 
 struct Pixel8 {
-  uint16_t r, g, b; // Valores de 0-255
+  uint8_t r, g, b; // Valores de 0-255
 };
 // A lo mejor las estructuras de pixel pueden ir en common
 
@@ -26,4 +26,4 @@ struct ImageAOS {
 };
 
 
-#endif //IMAGEAOS_HPP
+#endif //IMAGESOA_HPP

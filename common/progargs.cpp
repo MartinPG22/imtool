@@ -6,6 +6,8 @@
 #include "binaryio.cpp"
 #include "./imgaos/imageaos.hpp"
 #include "./imgaos/imageaos.cpp"
+#include "./imgsoa/imagesoa.hpp"
+#include "./imgsoa/imagesoa.cpp"
 
 #include <iostream>
 #include <string>
@@ -38,9 +40,17 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
 
     std::vector<std::string> copia_arg;
     copia_arg.assign(arguments.begin()+3, arguments.end());
-
     PPMMetadata metadata = readPPMMetadata(inputPath);
-    ImageAOS imagensrc = cargarImagenPPM(inputPath, metadata);
+    ImageAOS imagensrcAOS;
+    ImageSOA imagensrcSOA;
+
+    if (method == "soa") {
+        imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        imprimirImagenSOA(imagensrcSOA, metadata);
+    } else if (method == "aos") {
+        imagensrcAOS = cargarImagenPPM(inputPath, metadata);
+    }
+
     /* (DEPURACIÓN PARA COMPROBAR QUE SE TRANSFORMAN BIEN EN AOS)
     imprimirPixeles(imagen, metadata);
     */
@@ -129,8 +139,10 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
         //
         std::cout << "(Depuration) Executing 'resize' operation on: " << inputPath << std::endl;
         if (method == "aos") {
-            ImageAOS resizedImage = resize(imagensrc, metadata, newWidth, newHeight);
-        }
+            ImageAOS resizedImage = resize(imagensrcAOS, metadata, newWidth, newHeight);
+        } else if (method == "soa") {
+            /*ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
+        */}
 
     } else if (operation == "cutfreq") {
         if (arguments.size() != 4) {
