@@ -2,176 +2,206 @@
 //
 // Created by mapor on 07/10/2024.
 //
-#include "binaryio.hpp"
-#include "binaryio.cpp"
-#include "./imgaos/imageaos.hpp"
-#include "./imgaos/imageaos.cpp"
-#include "./imgsoa/imagesoa.hpp"
-#include "./imgsoa/imagesoa.cpp"
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <regex>
-#include <filesystem>  // Para trabajar con rutas de archivo
-
-#include "../imgaos/maxlevel.cpp"
-#include "../imgaos/resize.cpp"
+#include "progargs.hpp"
 
 
-bool isInteger(const std::string& s) {
-    return std::regex_match(s, std::regex("-?[0-9]+"));
+bool isInteger(const std::string& integer) {
+    return std::regex_match(integer, std::regex("-?[0-9]+"));
+}
+int executeInfo(const std::vector<std::string>& arguments, PPMMetadata& metadata) {
+    const std::string& inputPath = arguments[0];
+    const std::string& outputPath = arguments[1];
+    const std::string& operation = arguments[2];
+    std::vector<std::string> copia_arg;
+    copia_arg.assign(arguments.begin()+3, arguments.end());
+
+    if (arguments.size() != 3) {
+        std::cerr << "Error: Invalid extra arguments for info: ";
+        for (const auto& arg : copia_arg) {
+            std::cerr << arg << " ";
+        };
+        std::cerr << '\n';
+        return -1;
+    }
+    //execute modulo para el info
+    std::cout << "(DEPURACION) Executing 'info' operation on: " << inputPath << '\n';
+    std::cout << "Input: " << inputPath << '\n';
+    std::cout << "Out: " << outputPath << '\n';
+    std::cout << "Operation: " << operation << '\n';
+    std::cout << "Image size: " << metadata.height << "x"<< metadata.width << '\n';
+    std::cout << "Max level: " << metadata.max_value << '\n';
+    return 0;
+}
+
+int executeMaxlevel(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method) {
+    const std::string& inputPath = arguments[0];
+    const std::string& outputPath = arguments[1];
+    const std::string& operation = arguments[2];
+    std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
+    if (method == "soa") {
+        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        imprimirImagenSOA(imagensrcSOA, metadata);
+    } else if (method == "aos") {
+        ImageAOS const imagensrcAOS = cargarImagenPPM(inputPath, metadata);
+    }
+
+    if (arguments.size() != 4) {
+        std::cerr << "Error: Invalid number of extra arguments for maxlevel: " << arguments.size() - 3 << '\n';
+        return -1;
+    }
+    try {
+        int const newMaxLevel = std::stoi(arguments[3]);
+        if(0>newMaxLevel || newMaxLevel>MAX_NEW_LEVEL){
+            std::cerr << "Error: Invalid maxlevel: " << arguments[3] << '\n';
+            return -1;
+        }
+    } catch (std::invalid_argument&) {
+        std::cerr << "Error: Invalid maxlevel: " << arguments[3] << '\n';
+        return -1;
+    }
+    std::cout << "Executing 'maxlevel' operation with level on: " << inputPath << '\n';
+    maxlevel();
+    return 0;
+}
+
+int argumentsResize(const std::vector<std::string>& arguments) {
+    if (arguments.size() != ARG_RESIZE) {
+        std::cerr << "Error: Invalid number of extra arguments for resize: "<< arguments.size()-3 << '\n';
+        return -1;
+    }
+    if (!isInteger(arguments[3])) {
+        std::cerr << "Error: Invalid resize width: " << arguments[3] << '\n';
+        return -1; // Sale si no es un entero
+    }
+    try {
+        int const newWidth = std::stoi(arguments[3]);
+        if(0>newWidth){
+            std::cerr << "Error: Invalid resize width: " << arguments[3] << '\n';
+            return -1;
+        }
+    } catch (std::invalid_argument&) {
+        std::cerr << "Error: Invalid resize width: " << arguments[3] << '\n';
+        return -1;
+    }
+    if (!isInteger(arguments[4])) {
+        std::cerr << "Error: Invalid resize height: " << arguments[4] << '\n';
+        return -1; // Sale si no es un entero
+    }
+    try {
+        int const newHeight = std::stoi(arguments[4]);
+        if(0>newHeight){
+            std::cerr << "Error: Invalid resize height: " << arguments[4] << '\n';
+            return -1;
+        }
+    } catch (std::invalid_argument&) {
+        std::cerr << "Error: Invalid resize height: " << arguments[4] << '\n';
+        return -1;
+    }
+    std::cout << "(Depuracion) He pasado las condiciones de parametros " <<'\n';
+    return 0;
+}
+
+int executeResize(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method) {
+    const std::string& inputPath = arguments[0];
+    const std::string& outputPath = arguments[1];
+    const std::string& operation = arguments[2];
+
+    if (argumentsResize(arguments) ==-1){return -1;};
+    std::cout << "(Depuracion) Llego al resize " << inputPath << '\n';
+    std::vector<size_t> const newSize = {std::stoul(arguments[3]), std::stoul(arguments[4])};
+    //
+    std::cout << "(Depuration) Executing 'resize' operation on: " << inputPath << '\n';
+    if (method == "aos") {
+        ImageAOS const imagensrcAOS = cargarImagenPPM(inputPath, metadata);
+        ImageAOS const resizedImage = resize(imagensrcAOS, metadata, newSize, outputPath);
+    } else if (method == "soa") {
+        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        //imprimirImagenSOA(imagensrcSOA, metadata);
+        //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
+    }
+    std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
+    return 0;
+}
+int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method){
+    const std::string& inputPath = arguments[0];
+    const std::string& outputPath = arguments[1];
+    const std::string& operation = arguments[2];
+
+    if (method == "soa") {
+        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        imprimirImagenSOA(imagensrcSOA, metadata);
+    }
+    if (method == "aos") {
+        ImageAOS const imagensrcAOS = cargarImagenPPM(inputPath, metadata);
+    }
+    if (arguments.size() != 4) {
+            std::cerr << "Error: Invalid number of extra arguments for cutfreq: " << arguments.size() - 3 << '\n';
+            return -1;
+    }
+    if (!isInteger(arguments[3])) {
+        std::cerr << "Error: Invalid cutfreq: " << arguments[3] << '\n';
+        return -1; // Sale si no es un entero
+    }
+    int const numberOfColors = std::stoi(arguments[3]);
+    if (numberOfColors <= 0) {
+        std::cerr << "Error: Invalid cutfreq: " << arguments[3] << '\n';
+        return -1;
+    }
+
+    std::cout << "Executing 'cutfreq' operation with number of colors: " << numberOfColors << " on: " << inputPath << '\n';
+    std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
+    return 0;
+}
+
+int executeCompress(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method) {
+    const std::string& inputPath = arguments[0];
+    const std::string& outputPath = arguments[1];
+    const std::string& operation = arguments[2];
+
+    // Declara las variables antes de usarlas
+
+    if (arguments.size() != 3) {
+        std::cerr << "Error: Invalid extra arguments for compress: " << arguments.size() - 3 << '\n';
+        return -1;
+    }
+
+    std::cout << "Executing 'compress' operation on: " << inputPath << '\n';
+    if (method == "aos") {
+        ImageAOS const imagensrcAOS = cargarImagenPPM(inputPath, metadata);
+        writeCPPM(imagensrcAOS, outputPath,metadata);
+    } else if (method == "soa") {
+        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        //imprimirImagenSOA(imagensrcSOA, metadata);
+        //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
+    }
+    std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
+    return 0;
 }
 
 int executeOperation(const std::vector<std::string>& arguments,const std::string& method) {
     if (arguments.size() <3) {
-        std::cerr << "Error: Invalid number of arguments: " << arguments.size() << std::endl;
+        std::cerr << "Error: Invalid number of arguments: " << arguments.size() << '\n';
         return -1;
     }
-    std::string inputPath = arguments[0];
-    std::string outputPath = arguments[1];
-    std::string operation = arguments[2];
-
+    const std::string& inputPath = arguments[0];
+    const std::string& operation = arguments[2];
 
     if (operation != "info" && operation != "maxlevel" && operation != "resize" && operation != "cutfreq" && operation != "compress") {
-        std::cerr << "Error: Invalid operation: " << operation << std::endl;
+        std::cerr << "Error: Invalid operation: " << operation << '\n';
         return -1;
     }
-
-    std::vector<std::string> copia_arg;
-    copia_arg.assign(arguments.begin()+3, arguments.end());
     PPMMetadata metadata = readPPMMetadata(inputPath);
-    ImageAOS imagensrcAOS;
-    ImageSOA imagensrcSOA;
 
-    if (method == "soa") {
-        imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
-        imprimirImagenSOA(imagensrcSOA, metadata);
-    } else if (method == "aos") {
-        imagensrcAOS = cargarImagenPPM(inputPath, metadata);
-    }
-
-    /* (DEPURACIÓN PARA COMPROBAR QUE SE TRANSFORMAN BIEN EN AOS)
-    imprimirPixeles(imagen, metadata);
-    */
-    std::cout << "(Depuracion) Llego aqui " << inputPath << std::endl;
-    if (operation == "info") {
-        if (arguments.size() != 3) {
-            std::cerr << "Error: Invalid extra arguments for info: ";
-            for (const auto& arg : copia_arg) {
-                std::cerr << arg << " ";
-            };
-            std::cerr << std::endl;
-            return -1;
-        }
-        //execute modulo para el info
-        std::cout << "(DEPURACION) Executing 'info' operation on: " << inputPath << std::endl;
-        if (method == "aos") {
-            std::cout << "Input: " << inputPath << std::endl;
-            std::cout << "Out: " << outputPath << std::endl;
-            std::cout << "Operation: " << operation << std::endl;
-            std::cout << "Image size: " << metadata.height << "x"<< metadata.width << std::endl;
-            std::cout << "Max level: " << metadata.max_value << std::endl;
-        } else if (method == "soa") {
-            std::cout << "Input: " << inputPath << std::endl;
-            std::cout << "Out: " << outputPath << std::endl;
-            std::cout << "Operation: " << operation << std::endl;
-            std::cout << "Image size: " << metadata.height << "x"<< metadata.width << std::endl;
-            std::cout << "Max level: " << metadata.max_value << std::endl;
-        }
-        // se puede eliminar este if para el info ya que se hace antes de la conversión de las imagenes a soa o aos
-        // lo pongo ya que de momento no se usa el method en ningun lado, en el resto de funciones se deberia de usar
-
-    } else if (operation == "maxlevel") {
-        if (arguments.size() != 4) {
-            std::cerr << "Error: Invalid number of extra arguments for maxlevel: " << arguments.size() - 3 << std::endl;
-            return -1;
-        }
-        try {
-            int newMaxLevel = std::stoi(arguments[3]);
-            if(0>newMaxLevel || newMaxLevel>65535){
-                std::cerr << "Error: Invalid maxlevel: " << arguments[3] << std::endl;
-                return -1;
-            }
-        } catch (std::invalid_argument& e) {
-            std::cerr << "Error: Invalid maxlevel: " << arguments[3] << std::endl;
-            return -1;
-        }
-        std::cout << "Executing 'maxlevel' operation with level on: " << inputPath << std::endl;
-        maxlevel();
-    } else if (operation == "resize") {
-        std::cout << "(Depuracion) Llego al resize " << inputPath << std::endl;
-        if (arguments.size() != 5) {
-            std::cerr << "Error: Invalid number of extra arguments for resize: "<< arguments.size()-3 << std::endl;
-            return -1;
-        }
-        if (!isInteger(arguments[3])) {
-            std::cerr << "Error: Invalid resize width: " << arguments[3] << std::endl;
-            return -1; // Sale si no es un entero
-        }
-        try {
-            int newWidth = std::stoi(arguments[3]);
-            if(0>newWidth){
-                std::cerr << "Error: Invalid resize width: " << arguments[3] << std::endl;
-                return -1;
-            }
-        } catch (std::invalid_argument& e) {
-            std::cerr << "Error: Invalid resize width: " << arguments[3] << std::endl;
-            return -1;
-        }
-        if (!isInteger(arguments[4])) {
-            std::cerr << "Error: Invalid resize height: " << arguments[4] << std::endl;
-            return -1; // Sale si no es un entero
-        }
-        try {
-            int newHeight = std::stoi(arguments[4]);
-            if(0>newHeight){
-                std::cerr << "Error: Invalid resize height: " << arguments[4] << std::endl;
-                return -1;
-            }
-        } catch (std::invalid_argument& e) {
-            std::cerr << "Error: Invalid resize height: " << arguments[4] << std::endl;
-            return -1;
-        }
-        std::cout << "(Depuracion) He pasado las condiciones de parametros " << inputPath << std::endl;
-        size_t newWidth = std::stoul(arguments[3]);
-        size_t newHeight = std::stoul(arguments[4]);
-        //
-        std::cout << "(Depuration) Executing 'resize' operation on: " << inputPath << std::endl;
-        if (method == "aos") {
-            ImageAOS resizedImage = resize(imagensrcAOS, metadata, newWidth, newHeight);
-        } else if (method == "soa") {
-            /*ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
-        */}
-
-    } else if (operation == "cutfreq") {
-        if (arguments.size() != 4) {
-            std::cerr << "Error: Invalid number of extra arguments for cutfreq: " << arguments.size() - 3 << std::endl;
-            return -1;
-        }
-        if (!isInteger(arguments[3])) {
-            std::cerr << "Error: Invalid cutfreq: " << arguments[3] << std::endl;
-            return -1; // Sale si no es un entero
-        }
-        int numberOfColors = std::stoi(arguments[3]);
-        if (numberOfColors <= 0) {
-            std::cerr << "Error: Invalid cutfreq: " << arguments[3] << std::endl;
-            return -1;
-        }
-
-        std::cout << "Executing 'cutfreq' operation with number of colors: " << numberOfColors << " on: " << inputPath << std::endl;
+    std::cout << "(Depuracion) Llego aqui " << inputPath << '\n';
+    if (operation == "info") { executeInfo(arguments, metadata);
+    } else if (operation == "maxlevel") { executeMaxlevel(arguments, metadata, method);
+    } else if (operation == "resize") { executeResize(arguments, metadata, method);
+    } else if (operation == "cutfreq") {executeCutfreq(arguments, metadata, method);
 
     } else if (operation == "compress") {
-        if (arguments.size() != 3) {
-            std::cerr << "Error: Invalid extra arguments for compress: " << arguments.size() - 3 << std::endl;
-            return -1;
-        }
-
-        std::cout << "Executing 'compress' operation on: " << inputPath << std::endl;
-
     } else {
-        std::cerr << "Error: Invalid option: " << operation << std::endl;
+        std::cerr << "Error: Invalid option: " << operation << '\n';
     }
     return 0;
 }
-
