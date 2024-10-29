@@ -5,10 +5,20 @@
 #ifndef IMAGEAOS_HPP
 #define IMAGEAOS_HPP
 
-
 #include <vector>
 #include <cstdint>
 #include <variant>
+#include <iostream>
+#include <string>
+#include <array>  // Asegúrate de incluir este encabezado
+#include "./common/binaryio.hpp"
+
+
+const int MAX_8 = 255;
+const int changeBits = 8;
+const int buffer_size_8 = 3;
+const int buffer_size_16 = 6;
+
 
 /// Estructura que representa un píxel con componentes R, G, B
 struct Pixel16 {
@@ -24,6 +34,8 @@ struct Pixel8 {
 struct ImageAOS {
   std::variant<std::vector<Pixel8>, std::vector<Pixel16>> pixels; // Vector de píxeles (estructura AOS)
 };
+ImageAOS cargarPixels8(std::ifstream& archivo, size_t num_pixels);
+ImageAOS cargarPixels16(std::ifstream& archivo, size_t num_pixels);
+ImageAOS cargarImagenPPM(const std::string& nombre_archivo, PPMMetadata& metadata);
 
-
-#endif //IMAGESOA_HPP
+#endif //IMAGEAOS_HPP

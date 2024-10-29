@@ -9,7 +9,9 @@
 #include <vector>
 #include <cstdint>
 #include <string>
-#include <stdexcept>
+
+
+const int MAX_16 = 65535;
 
 // Estructura para almacenar los metadatos de la imagen
 struct PPMMetadata {
@@ -19,5 +21,7 @@ struct PPMMetadata {
 };
 // Prototipo de la función para leer un archivo binario
 std::vector<uint8_t> readBinaryFile(const std::string& filename);
-
+PPMMetadata readPPMMetadata(const std::string& filename);
+std::string readLine(const std::vector<uint8_t>& data, size_t& index);
+int readNextInt(const std::vector<uint8_t>& data, size_t& index, const std::string& errorMsg);
 #endif // BINARYIO_HPP

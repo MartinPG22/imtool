@@ -3,12 +3,8 @@
 //
 
 #include "binaryio.hpp"
-#include <vector>
-#include <cstdint>
-#include <string>
-#include <stdexcept>
 
-#include "binaryio.hpp"
+
 
 // Función para leer un archivo binario y devolver un vector de bytes
 std::vector<uint8_t> readBinaryFile(const std::string& filename) {
@@ -19,7 +15,7 @@ std::vector<uint8_t> readBinaryFile(const std::string& filename) {
 
   // Obtener el tamaño del archivo
   file.seekg(0, std::ios::end);
-  std::streamoff fileSize = file.tellg(); // Obtiene la posición del final del archivo
+  const std::streamoff fileSize = file.tellg(); // Obtiene la posición del final del archivo
 
   // Verificar si tellg() tuvo éxito
   if (fileSize == -1) {
@@ -33,62 +29,67 @@ std::vector<uint8_t> readBinaryFile(const std::string& filename) {
 
   file.seekg(0, std::ios::beg);
   // Usar static_cast para evitar la advertencia de conversión de signación
-  std::vector<uint8_t> buffer(static_cast<size_t>(fileSize)); // Conversión explícita
-  file.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(fileSize));
+  std::vector<char> buffer(static_cast<size_t>(fileSize));
+  file.read(buffer.data(), static_cast<std::streamsize>(fileSize));
 
   file.close();
-  return buffer;
+  // Convertir buffer de char a uint8_t
+  std::vector<uint8_t> uint8Buffer(buffer.begin(), buffer.end());
+  return uint8Buffer;
+}
+
+
+// Función auxiliar para leer una línea completa (hasta '\n') y convertirla en string
+std::string readLine(const std::vector<uint8_t>& data, size_t& index) {
+  std::string line;
+  while (index < data.size() && data[index] != '\n') {
+    line += static_cast<char>(data[index++]);
+  }
+  ++index;  // Saltar el '\n'
+  return line;
+}
+
+// Función auxiliar para leer el siguiente número entero en el archivo
+int readNextInt(const std::vector<uint8_t>& data, size_t& index, const std::string& errorMsg) {
+  // Saltar espacios y saltos de línea
+  while (index < data.size() && (data[index] == ' ' || data[index] == '\n')) {
+    ++index;
+  }
+  std::string num;
+  while (index < data.size() && data[index] >= '0' && data[index] <= '9') {
+    num += static_cast<char>(data[index++]);
+  }
+
+  int const value = std::stoi(num);
+  if (value < 0) {
+    throw std::runtime_error(errorMsg);
+  }
+  return value;
 }
 
 // Función para leer los metadatos de un archivo PPM
 PPMMetadata readPPMMetadata(const std::string& filename) {
-  std::vector<uint8_t> fileData = readBinaryFile(filename);
+  std::vector<uint8_t> const fileData = readBinaryFile(filename);
   size_t index = 0;
-  PPMMetadata metadata;
+  PPMMetadata metadata{};
 
-  // Leer el formato PPM
-  std::string format;
-  while (fileData[index] != '\n') {
-    format += static_cast<char>(fileData[index++]); // Conversión explícita
-  }
-  ++index;  // Saltar el '\n'
-
+  // Leer y verificar el formato PPM (P6)
+  std::string const format = readLine(fileData, index);
   if (format != "P6") {
     throw std::runtime_error("Formato PPM no soportado.");
   }
 
   // Leer ancho, alto y valor máximo
-  auto readNextInt = [&fileData, &index]() -> int {
-    std::string num;
-    while (fileData[index] == ' ' || fileData[index] == '\n') {
-      ++index;  // Saltar espacios y saltos de línea
-    }
-    while (fileData[index] >= '0' && fileData[index] <= '9') {
-      num += static_cast<char>(fileData[index++]);
+  metadata.width = static_cast<size_t>(readNextInt(fileData, index, "Ancho de imagen no válido."));
+  metadata.height = static_cast<size_t>(readNextInt(fileData, index, "Altura de imagen no válida."));
+  metadata.max_value = readNextInt(fileData, index, "Máximo valor de color no válido.");
 
-    }
-    return std::stoi(num);
-  };
-
-  int widthValue = readNextInt();
-  if (widthValue < 0) {
-    throw std::runtime_error("Ancho de imagen no válido.");
-  }
-  metadata.width = static_cast<size_t>(widthValue);
-
-  int heightValue = readNextInt();
-  if (heightValue < 0) {
-    throw std::runtime_error("Altura de imagen no válida.");
-  }
-  metadata.height = static_cast<size_t>(heightValue);
-
-  metadata.max_value = readNextInt();
-
-  // Asegurarse de que max_value esté en el rango esperado
-  if (metadata.max_value > 255 && metadata.max_value != 65535) {
-    throw std::runtime_error("Máximo valor de color no soportado.");
+  // Verificar el rango de max_value (1 a 65535)
+  if (metadata.max_value < 1 || metadata.max_value > MAX_16) {
+    throw std::runtime_error("Máximo valor de color fuera de rango. Debe estar entre 1 y 65535.");
   }
 
   return metadata;
 }
-//df
+
+
