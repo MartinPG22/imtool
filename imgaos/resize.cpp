@@ -225,11 +225,11 @@ void savePixelsToPPM16(const std::string& outputPath, const std::vector<Pixel16>
     }
     outFile << "P6\n" << newWidth << " " << newHeight << "\n" << intensidad << "\n"; // Encabezado para Pixel16
     for (const auto& pixel : pixels) {
-        outFile.put(static_cast<char>(pixel.r >> MIN_PIXEL_VALUE)); // Escribir el byte alto
+        outFile.put(static_cast<char>(pixel.r >> changeBits)); // Escribir el byte alto
         outFile.put(static_cast<char>(pixel.r & MAX_PIXEL_VALUE)); // Escribir el byte bajo
-        outFile.put(static_cast<char>(pixel.g >> MIN_PIXEL_VALUE)); // Escribir el byte alto
+        outFile.put(static_cast<char>(pixel.g >> changeBits)); // Escribir el byte alto
         outFile.put(static_cast<char>(pixel.g & MAX_PIXEL_VALUE)); // Escribir el byte bajo
-        outFile.put(static_cast<char>(pixel.b >> MIN_PIXEL_VALUE)); // Escribir el byte alto
+        outFile.put(static_cast<char>(pixel.b >> changeBits)); // Escribir el byte alto
         outFile.put(static_cast<char>(pixel.b & MAX_PIXEL_VALUE)); // Escribir el byte bajo
     }
     outFile.close();

@@ -12,7 +12,7 @@
 #include "./common/binaryio.hpp" // Asegúrate de que este archivo existe y es accesible
 
 
-constexpr uint8_t MAX_PIXEL_VALUE = 0xFF; // Valor máximo para píxeles de 8 bits
+
 constexpr uint8_t MIN_PIXEL_VALUE = 8;
 
 uint8_t interpolate8(uint8_t v00, uint8_t v01, float ttt);

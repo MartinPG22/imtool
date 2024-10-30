@@ -21,6 +21,7 @@
 #include "../imgaos/maxlevel.cpp"
 #include "../imgaos/resize.hpp"
 #include "../imgaos/compress.cpp"
+#include "../imgaos/cutfreq.cpp"
 
 const size_t ARG_RESIZE = 5;
 const int MAX_NEW_LEVEL = 65535;

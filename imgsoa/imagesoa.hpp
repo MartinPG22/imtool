@@ -8,6 +8,7 @@
 #include <vector>
 #include <cstdint>
 #include <variant>
+#include "./common/binaryio.hpp"
 // Estructura que representa la imagen en formato AOS (Array of Structures)
 struct ImageSOA {
   std::variant<std::vector<uint8_t>, std::vector<uint16_t>> redChannel; // Vector de píxeles (estructura AOS)

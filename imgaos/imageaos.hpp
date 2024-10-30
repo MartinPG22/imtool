@@ -14,10 +14,12 @@
 #include "./common/binaryio.hpp"
 
 
-const int MAX_8 = 255;
-const int changeBits = 8;
-const int buffer_size_8 = 3;
-const int buffer_size_16 = 6;
+constexpr int MAX_8 = 255;
+constexpr int changeBits = 8;
+constexpr int changeBits16 = 16;
+constexpr int buffer_size_8 = 3;
+constexpr int buffer_size_16 = 6;
+constexpr uint8_t MAX_PIXEL_VALUE = 0xFF; // Valor máximo para píxeles de 8 bits
 
 
 /// Estructura que representa un píxel con componentes R, G, B

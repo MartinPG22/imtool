@@ -2,4 +2,6 @@
 add_library(imgsoa
         imagesoa.cpp
         imagesoa.hpp
+        compress.cpp
+        compress.hpp
 )

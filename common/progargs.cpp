@@ -123,21 +123,14 @@ int executeResize(const std::vector<std::string>& arguments, PPMMetadata& metada
     std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
     return 0;
 }
-int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method){
+int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method) {
     const std::string& inputPath = arguments[0];
     const std::string& outputPath = arguments[1];
     const std::string& operation = arguments[2];
 
-    if (method == "soa") {
-        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
-        imprimirImagenSOA(imagensrcSOA, metadata);
-    }
-    if (method == "aos") {
-        ImageAOS const imagensrcAOS = cargarImagenPPM(inputPath, metadata);
-    }
     if (arguments.size() != 4) {
-            std::cerr << "Error: Invalid number of extra arguments for cutfreq: " << arguments.size() - 3 << '\n';
-            return -1;
+        std::cerr << "Error: Invalid number of extra arguments for cutfreq: " << arguments.size() - 3 << '\n';
+        return -1;
     }
     if (!isInteger(arguments[3])) {
         std::cerr << "Error: Invalid cutfreq: " << arguments[3] << '\n';
@@ -148,13 +141,19 @@ int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metad
         std::cerr << "Error: Invalid cutfreq: " << arguments[3] << '\n';
         return -1;
     }
-
+    if (method == "aos") {
+        ImageAOS imagensrcAOS = cargarImagenPPM(inputPath, metadata);
+        cutfreq(imagensrcAOS,metadata,numberOfColors, outputPath);
+    } else if (method == "soa") {
+        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        //imprimirImagenSOA(imagensrcSOA, metadata);
+        //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
+    }
     std::cout << "Executing 'cutfreq' operation with number of colors: " << numberOfColors << " on: " << inputPath << '\n';
     std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
     return 0;
 }
-
-int executeCompress(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method) {
+int executeCompress(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method){
     const std::string& inputPath = arguments[0];
     const std::string& outputPath = arguments[1];
     const std::string& operation = arguments[2];
@@ -195,11 +194,10 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
 
     std::cout << "(Depuracion) Llego aqui " << inputPath << '\n';
     if (operation == "info") { executeInfo(arguments, metadata);
-    } else if (operation == "maxlevel") { executeMaxlevel(arguments, metadata, method);
-    } else if (operation == "resize") { executeResize(arguments, metadata, method);
+    } else if (operation == "maxlevel") {executeMaxlevel(arguments, metadata, method);
+    } else if (operation == "resize") {executeResize(arguments, metadata, method);
     } else if (operation == "cutfreq") {executeCutfreq(arguments, metadata, method);
-
-    } else if (operation == "compress") {
+    } else if (operation == "compress") {executeCompress(arguments, metadata, method);
     } else {
         std::cerr << "Error: Invalid option: " << operation << '\n';
     }
