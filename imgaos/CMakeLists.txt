@@ -10,7 +10,6 @@ add_library(imgaos
         resize.hpp
         compress.cpp
         compress.hpp
-        newresize.cpp
         cutfreq.cpp
         cutfreq.hpp
 )

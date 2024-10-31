@@ -145,9 +145,13 @@ int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metad
         ImageAOS imagensrcAOS = cargarImagenPPM(inputPath, metadata);
         cutfreq(imagensrcAOS,metadata,numberOfColors, outputPath);
     } else if (method == "soa") {
-        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
-        //imprimirImagenSOA(imagensrcSOA, metadata);
-        //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
+        //ImageSOA imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        // Contar frecuencias de cada canal
+        //ColorFrequencies const freqs = contarFrecuencias(imagensrcSOA, metadata.width, metadata.height);
+
+        // Reemplazar colores
+        //cutfreqAOS(imagensrcSOA, metadata.width, freqs, metadata.height);
+
     }
     std::cout << "Executing 'cutfreq' operation with number of colors: " << numberOfColors << " on: " << inputPath << '\n';
     std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';

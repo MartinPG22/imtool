@@ -4,4 +4,6 @@ add_library(imgsoa
         imagesoa.hpp
         compress.cpp
         compress.hpp
+        cutfreq.cpp
+        cutfreq.hpp
 )
