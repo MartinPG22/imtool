@@ -8,12 +8,13 @@
 #include <cstdint>
 
 #include "imageaos.hpp"
+#include "maxlevel.hpp"
 
 
 int maxlevel(const ImageAOS& srcImage,
     const PPMMetadata& metadata, const int newMaxLevel, const std::string& outputPath) {
     /*
-    // TODO: Pasar esto al metodo de cargarImagenPPM e ImageAOS.hpp
+    //  Pasar esto al metodo de cargarImagenPPM e ImageAOS.hpp
     std::string format;
     file >> format;
     if (format != "P6") {
@@ -67,7 +68,7 @@ int maxlevel(const ImageAOS& srcImage,
         outFile.put(static_cast<char>(b)); // Escribir el valor azul
     }
     outFile.close();
-    std::cout << "La imagen con el nuevo nivel máximo de intensidad se ha guardado en output.ppm." << '\n';
+    std::cout << "La imagen con el nuevo nivel máximo de intensidad se ha guardado en " << outputPath << '\n';
 
     return 0;
 }

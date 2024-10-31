@@ -18,7 +18,7 @@
 #include <regex>
 #include <filesystem>  // Para trabajar con rutas de archivo
 
-#include "../imgaos/maxlevel.cpp"
+#include "../imgaos/maxlevel.hpp"
 #include "../imgaos/resize.hpp"
 #include "../imgaos/compress.cpp"
 #include "../imgaos/cutfreq.cpp"
