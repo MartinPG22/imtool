@@ -3,14 +3,13 @@ add_library(imgaos
         other1.cpp
         other2.cpp
         maxlevel.cpp
-        maxlevel.h
+        maxlevel.hpp
         imageaos.cpp
         imageaos.hpp
         resize.cpp
         resize.hpp
         compress.cpp
         compress.hpp
-        newresize.cpp
         cutfreq.cpp
         cutfreq.hpp
 )

@@ -61,7 +61,14 @@ int executeMaxlevel(const std::vector<std::string>& arguments, PPMMetadata& meta
         return -1;
     }
     std::cout << "Executing 'maxlevel' operation with level on: " << inputPath << '\n';
-    maxlevel();
+    if (method == "aos") {
+        ImageAOS const imagensrcAOS = cargarImagenPPM(inputPath, metadata);
+        maxlevel(imagensrcAOS, metadata, std::stoi(arguments[3]), outputPath);
+    } else if (method == "soa") {
+        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        //imprimirImagenSOA(imagensrcSOA, metadata);
+        //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
+    }
     return 0;
 }
 
