@@ -4,7 +4,7 @@
 
 #include "cutfreq.hpp"
 
-
+#include <algorithm>
 
 ColorFrequencies contarFrecuencias(const ImageSOA& imagen, int width, int height) {
   ColorFrequencies freqs;
