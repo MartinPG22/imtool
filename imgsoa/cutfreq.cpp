@@ -4,7 +4,6 @@
 
 #include "cutfreq.hpp"
 
-#include <algorithm>
 
 ColorFrequencies contarFrecuencias(const ImageSOA& imagen, int width, int height) {
   ColorFrequencies freqs;
@@ -31,7 +30,7 @@ void cutfreqAOS(ImageSOA& imagen, const PPMMetadata& metadata, const std::string
   auto& blue = std::get<std::vector<uint8_t>>(imagen.blueChannel);
 
   // Determinar qué canal es el de origen y cuál es el de destino
-  std::vector<uint8_t>* sourceChannel = nullptr;
+  const std::vector<uint8_t>* sourceChannel = nullptr;
   std::vector<uint8_t>* targetChannel = nullptr;
 
   if (freqs.redCount == maxFreq) { sourceChannel = &red;
@@ -87,12 +86,12 @@ void saveImageSOAToPPM(const ImageSOA& image, const PPMMetadata& metadata, const
 
         // Escribir datos en formato binario
         for (size_t i = 0; i < static_cast<size_t>(metadata.width) * metadata.height; ++i) {
-            outFile.put(static_cast<char>(red[i] >> 8));      // Byte alto
-            outFile.put(static_cast<char>(red[i] & 0xFF));    // Byte bajo
-            outFile.put(static_cast<char>(green[i] >> 8));    // Byte alto
-            outFile.put(static_cast<char>(green[i] & 0xFF));  // Byte bajo
-            outFile.put(static_cast<char>(blue[i] >> 8));     // Byte alto
-            outFile.put(static_cast<char>(blue[i] & 0xFF));   // Byte bajo
+            outFile.put(static_cast<char>(red[i] >> BYTE_SIZE));      // Byte alto
+            outFile.put(static_cast<char>(red[i] & HEX_VAL));    // Byte bajo
+            outFile.put(static_cast<char>(green[i] >> BYTE_SIZE));    // Byte alto
+            outFile.put(static_cast<char>(green[i] & HEX_VAL));  // Byte bajo
+            outFile.put(static_cast<char>(blue[i] >> BYTE_SIZE));     // Byte alto
+            outFile.put(static_cast<char>(blue[i] & HEX_VAL));   // Byte bajo
         }
     } else {
         std::cerr << "Error: Tipo de canal de color no compatible.\n";
