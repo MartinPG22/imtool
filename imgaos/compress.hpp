@@ -26,9 +26,9 @@ struct Color {
   Color(T red, T green, T blue) : components{red, green, blue} {}
 
   // Accesores para facilitar el acceso a los componentes
-  T r() const { return components[0]; }
-  T g() const { return components[1]; }
-  T b() const { return components[2]; }
+  [[nodiscard]] T r() const { return components[0]; }
+  [[nodiscard]] T g() const { return components[1]; }
+  [[nodiscard]] T b() const { return components[2]; }
 };
 // Puedes definir el constructor aquí o en el archivo .cpp
 

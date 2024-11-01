@@ -18,6 +18,6 @@ struct ColorFrequencies {
   int blueCount = 0;
 };
 ColorFrequencies contarFrecuencias(const ImageSOA& imagen, int width, int height);
-void cutfreqAOS(ImageSOA& imagen, const PPMMetadata& metadata, const std::string& outputPath, const ColorFrequencies& freqs );
+void cutfreqAOS(const ImageSOA& imagen, const PPMMetadata& metadata, const std::string& outputPath, const ColorFrequencies& freqs );
 void saveImageSOAToPPM(const ImageSOA& image, const PPMMetadata& metadata, const std::string& outputPath);
 #endif //CUTFREQAOS_HPP

@@ -5,6 +5,14 @@
 
 #include "progargs.hpp"
 
+#include "binaryio.hpp"
+#include "./imgaos/imageaos.hpp"
+#include "./imgsoa/imagesoa.hpp"
+
+#include "../imgaos/compress.hpp"
+#include "../imgaos/cutfreq.hpp"
+#include "../imgsoa/cutfreq.hpp"
+
 
 bool isInteger(const std::string& integer) {
     return std::regex_match(integer, std::regex("-?[0-9]+"));
@@ -152,7 +160,7 @@ int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metad
         ImageAOS imagensrcAOS = cargarImagenPPM(inputPath, metadata);
         cutfreq(imagensrcAOS,metadata,numberOfColors, outputPath);
     } else if (method == "soa") {
-        ImageSOA imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        const ImageSOA imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
 
         // Contar frecuencias de cada canal
         ColorFrequencies const freqs = contarFrecuencias(imagensrcSOA, static_cast<int>(metadata.width), static_cast<int>(metadata.height));

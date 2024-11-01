@@ -1,5 +1,6 @@
-add_executable(imtool-aos main.cpp)
-target_link_libraries (imtool-aos imgaos common)
+add_executable(imtool-aos main.cpp
+        main.hpp)
+target_link_libraries(imtool-aos imgsoa common imgaos)
 
 # Use this line only if you have dependencies from this library to GSL
 #find_package(GSL REQUIRED)

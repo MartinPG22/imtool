@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <span>
-#include "../common/progargs.cpp"  // Incluir la cabecera de la función
+#include "../common/progargs.hpp"  // Incluir la cabecera de la función
 
 int main(const int argc, char* argv[]) {
   // Convertir argc a std::size_t para evitar la advertencia
