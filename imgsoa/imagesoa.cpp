@@ -3,6 +3,7 @@
 //
 
 #include "imagesoa.hpp"
+
 #include "./common/binaryio.hpp"
 
 #include <fstream>
@@ -10,11 +11,65 @@
 #include <vector>
 #include <variant>
 #include <string>
+#include <array>
 
+
+// Función auxiliar para leer canales con componentes de 8 bits
+void leerCanales8Bits(std::ifstream& archivo, ImageSOA& imagen, const size_t num_pixels) {
+    auto& red = std::get<std::vector<uint8_t>>(imagen.redChannel);
+    auto& green = std::get<std::vector<uint8_t>>(imagen.greenChannel);
+    auto& blue = std::get<std::vector<uint8_t>>(imagen.blueChannel);
+
+    std::array<char, 1> buffer{};
+    for (size_t i = 0; i < num_pixels; i++) {
+        archivo.read(buffer.data(), 1);
+        red[i] = static_cast<uint8_t>(buffer[0]);
+
+        archivo.read(buffer.data(), 1);
+        green[i] = static_cast<uint8_t>(buffer[0]);
+
+        archivo.read(buffer.data(), 1);
+        blue[i] = static_cast<uint8_t>(buffer[0]);
+    }
+}
+
+// Función auxiliar para leer canales con componentes de 16 bits
+void leerCanales16Bits(std::ifstream& archivo, ImageSOA& imagen, const size_t num_pixels) {
+    auto& red = std::get<std::vector<uint16_t>>(imagen.redChannel);
+    auto& green = std::get<std::vector<uint16_t>>(imagen.greenChannel);
+    auto& blue = std::get<std::vector<uint16_t>>(imagen.blueChannel);
+
+    std::array<char, 1> buffer{};
+    for (size_t i = 0; i < num_pixels; ++i) {
+        archivo.read(buffer.data(), 1);
+        auto r_low = static_cast<uint8_t>(buffer[0]);
+
+        archivo.read(buffer.data(), 1);
+        auto r_high = static_cast<uint8_t>(buffer[0]);
+
+        archivo.read(buffer.data(), 1);
+        auto g_low = static_cast<uint8_t>(buffer[0]);
+
+        archivo.read(buffer.data(), 1);
+        auto g_high = static_cast<uint8_t>(buffer[0]);
+
+        archivo.read(buffer.data(), 1);
+        auto b_low = static_cast<uint8_t>(buffer[0]);
+
+        archivo.read(buffer.data(), 1);
+        auto b_high = static_cast<uint8_t>(buffer[0]);
+
+        red[i] = static_cast<uint16_t>(r_low | (r_high << BYTE_SIZE));
+        green[i] = static_cast<uint16_t>(g_low | (g_high << BYTE_SIZE));
+        blue[i] = static_cast<uint16_t>(b_low | (b_high << BYTE_SIZE));
+    }
+}
+
+// Función para cargar una imagen PPM en formato SOA
 ImageSOA cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& metadata) {
     std::ifstream archivo(nombre_archivo, std::ios::binary);
     if (!archivo) {
-        std::cerr << "Error: No se puede abrir el archivo." << std::endl;
+        std::cerr << "Error: No se puede abrir el archivo." << '\n';
         return {};
     }
 
@@ -22,7 +77,7 @@ ImageSOA cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& meta
     std::string magicNumber;
     archivo >> magicNumber;
     if (magicNumber != "P6") {
-        std::cerr << "Error: Formato no soportado." << std::endl;
+        std::cerr << "Error: Formato no soportado." << '\n';
         return {};
     }
 
@@ -31,51 +86,19 @@ ImageSOA cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& meta
     archivo.ignore(); // Ignorar el salto de línea después del encabezado
 
     ImageSOA imagen;
-    size_t num_pixels = metadata.width * metadata.height;
+    size_t const num_pixels = metadata.width * metadata.height;
     // Leer los píxeles en función del valor máximo
-    if (metadata.max_value <= 255) {
+    if (metadata.max_value <= METATADATA_MAX_VALUE) {
         imagen.redChannel = std::vector<uint8_t>(num_pixels);
         imagen.greenChannel = std::vector<uint8_t>(num_pixels);
         imagen.blueChannel = std::vector<uint8_t>(num_pixels);
-
-        auto& red = std::get<std::vector<uint8_t>>(imagen.redChannel);
-        auto& green = std::get<std::vector<uint8_t>>(imagen.greenChannel);
-        auto& blue = std::get<std::vector<uint8_t>>(imagen.blueChannel);
-
-        for (size_t i = 0; i < num_pixels; i++) {
-            archivo.read(reinterpret_cast<char*>(&red[i]), 1);
-            archivo.read(reinterpret_cast<char*>(&green[i]), 1);
-            archivo.read(reinterpret_cast<char*>(&blue[i]), 1);
-        }
+        leerCanales8Bits(archivo, imagen, num_pixels);
     } else {
         // Caso: 2 bytes por componente (RGB) en formato little-endian
         imagen.redChannel = std::vector<uint16_t>(num_pixels);
         imagen.greenChannel = std::vector<uint16_t>(num_pixels);
         imagen.blueChannel = std::vector<uint16_t>(num_pixels);
-
-        auto& red = std::get<std::vector<uint16_t>>(imagen.redChannel);
-        auto& green = std::get<std::vector<uint16_t>>(imagen.greenChannel);
-        auto& blue = std::get<std::vector<uint16_t>>(imagen.blueChannel);
-
-        for (size_t i = 0; i < num_pixels; ++i) {
-            uint8_t r_low, r_high, g_low, g_high, b_low, b_high;
-
-            archivo.read(reinterpret_cast<char*>(&r_low), 1);
-            archivo.read(reinterpret_cast<char*>(&r_high), 1);
-            archivo.read(reinterpret_cast<char*>(&g_low), 1);
-            archivo.read(reinterpret_cast<char*>(&g_high), 1);
-            archivo.read(reinterpret_cast<char*>(&b_low), 1);
-            archivo.read(reinterpret_cast<char*>(&b_high), 1);
-
-            // Convertir a little-endian (colocar el byte bajo en la posición menos significativa
-            uint16_t r = static_cast<uint16_t>(r_low | (r_high << 8)); // Combinar bytes en little-endian
-            uint16_t g = static_cast<uint16_t>(g_low | (g_high << 8)); // Combinar bytes en little-endian
-            uint16_t b = static_cast<uint16_t>(b_low | (b_high << 8)); // Combinar bytes en little-endian
-
-            red[i] = r;
-            green[i] = g;
-            blue[i] = b;
-        }
+        leerCanales16Bits(archivo, imagen, num_pixels);
     }
     return imagen;
 }
@@ -83,7 +106,7 @@ ImageSOA cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& meta
 // Función para imprimir la estructura ImageSOA
 void imprimirImagenSOA(const ImageSOA& imagen, const PPMMetadata& metadata) {
     // Obtener el número total de píxeles
-    size_t num_pixels = metadata.width * metadata.height;
+    size_t const num_pixels = metadata.width * metadata.height;
 
     // Función lambda para imprimir los valores de un canal
     auto imprimirCanal = [num_pixels](const auto& canal, const std::string& nombre) {
@@ -91,7 +114,7 @@ void imprimirImagenSOA(const ImageSOA& imagen, const PPMMetadata& metadata) {
         for (size_t i = 0; i < num_pixels; ++i) {
             std::cout << static_cast<int>(canal[i]) << " "; // Usar static_cast para mostrar uint8_t correctamente
         }
-        std::cout << std::endl;
+        std::cout << '\n';
     };
 
     // Imprimir canal rojo

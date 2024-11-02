@@ -6,6 +6,9 @@ add_library(common
         progargs.hpp
         binaryio.hpp
 )
+# Link imgsoa with common
+target_link_libraries(common PUBLIC imgsoa)
+
 # Use this line only if you have dependencies from this library to GSL
 #find_package(GSL REQUIRED)
 #target_link_libraries (common PRIVATE Microsoft.GSL::GSL)
