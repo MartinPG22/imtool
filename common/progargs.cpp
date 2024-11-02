@@ -9,10 +9,11 @@
 #include "./imgaos/imageaos.hpp"
 #include "./imgsoa/imagesoa.hpp"
 
+#include "../imgsoa/compress.hpp"
 #include "../imgaos/compress.hpp"
 #include "../imgaos/cutfreq.hpp"
 #include "../imgsoa/cutfreq.hpp"
-
+#include "../imgsoa/cutfreq.cpp"
 
 bool isInteger(const std::string& integer) {
     return std::regex_match(integer, std::regex("-?[0-9]+"));
@@ -160,12 +161,12 @@ int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metad
         ImageAOS imagensrcAOS = cargarImagenPPM(inputPath, metadata);
         cutfreq(imagensrcAOS,metadata,numberOfColors, outputPath);
     } else if (method == "soa") {
-        const ImageSOA imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        //const ImageSOA imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
 
         // Contar frecuencias de cada canal
-        ColorFrequencies const freqs = contarFrecuencias(imagensrcSOA, static_cast<int>(metadata.width), static_cast<int>(metadata.height));
+        //ColorFrequencies const freqs = contarFrecuencias(imagensrcSOA, static_cast<int>(metadata.width), static_cast<int>(metadata.height));
         // Reemplazar colores
-        cutfreqAOS(imagensrcSOA,metadata, outputPath, freqs);
+        //cutfreqAOS(imagensrcSOA,metadata, outputPath, freqs);
 
     }
     std::cout << "Executing 'cutfreq' operation with number of colors: " << numberOfColors << " on: " << inputPath << '\n';
@@ -191,7 +192,7 @@ int executeCompress(const std::vector<std::string>& arguments, PPMMetadata& meta
     } else if (method == "soa") {
         ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
         //imprimirImagenSOA(imagensrcSOA, metadata);
-        //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
+        writeCPPMSOA(imagensrcSOA, outputPath,metadata);
     }
     std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
     return 0;
