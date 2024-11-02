@@ -24,8 +24,6 @@ struct TupleHash {
     }, tuple);
   }
 };
-
-
 void writeCPPMSOA(const ImageSOA& image, const std::string& filename, const PPMMetadata& metadata);
 
-#endif //COMPRESS_HPPAOS
+#endif //COMPRESSAOS_HPP
