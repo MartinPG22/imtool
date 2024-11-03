@@ -11,15 +11,17 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <unordered_map>
+#include <tuple>
 #include "imagesoa.hpp"
 #include "./common/binaryio.hpp"
-struct ColorFrequencies {
-  int redCount = 0;
-  int greenCount = 0;
-  int blueCount = 0;
-};
-constexpr int HEX_VAL = 0xFF;
-ColorFrequencies contarFrecuencias(const ImageSOA& imagen, int width, int height);
-void cutfreqSOA(const ImageSOA& imagen, const PPMMetadata& metadata, const std::string& outputPath, const ColorFrequencies& freqs );
+
+constexpr int MAX_COLOR_VALUE = 0xFF;
+
+// Function declarations matching cutfreq.cpp
+void countColorFrequency(const ImageSOA& srcImage, std::unordered_map<int, int>& colorFrequency);
+void applyColorReplacement(ImageSOA& srcImage, const std::unordered_map<int, std::tuple<int, int, int>>& replacementMap);
+void cutfreqSOA(ImageSOA& srcImage, const PPMMetadata& metadata, int nColores, const std::string& outputPath);
 void saveImageSOAToPPM(const ImageSOA& image, const PPMMetadata& metadata, const std::string& outputPath);
-#endif //CUTFREQ_SOA_HPP
+
+#endif // CUTFREQ_SOA_HPP
