@@ -4,38 +4,20 @@
 
 #include "maxlevel.hpp"
 
-struct ImageData {
-    std::vector<uint8_t> red;
-    std::vector<uint8_t> green;
-    std::vector<uint8_t> blue;
-    PPMMetadata metadata;
-    int maxLevel;
-};
 
-namespace {
-    int saveImage(const ImageData& imageData, const std::string& outputPath) {
-        std::ofstream outFile(outputPath, std::ios::binary);
-        if (!outFile.is_open()) {
-            std::cerr << "No se pudo abrir el archivo de salida" << '\n';
-            return 1;
-        }
-
-        // Escribir el encabezado
-        outFile << "P6\n" << imageData.metadata.width << " " << imageData.metadata.height << "\n" << imageData.maxLevel << "\n";
-
-        // Escribir los valores de los píxeles en el formato binario
-        for (size_t i = 0; i < imageData.red.size(); ++i) {
-            outFile.put(static_cast<char>(imageData.red[i]));
-            outFile.put(static_cast<char>(imageData.green[i]));
-            outFile.put(static_cast<char>(imageData.blue[i]));
-        }
-
-        outFile.close();
-        std::cout << "La imagen con el nuevo nivel máximo de intensidad se ha guardado en " << outputPath << '\n';
-        return 0;
-    }
-}
-
+/**
+ * @brief Cambia el nivel máximo de intensidad de una imagen en formato SOA.
+ *
+ * Esta función cambia el nivel máximo de intensidad de una imagen en formato SOA.
+ *
+ * @param srcImage La imagen en formato SOA.
+ * @param metadata Metadatos de la imagen.
+ * @param newMaxLevel El nuevo nivel máximo de intensidad.
+ * @param outputPath La ruta donde se guardará la imagen con el nuevo nivel máximo.
+ * @return int 0 si la imagen se guardó correctamente, 1 si hubo un error al abrir el archivo o
+ *             si el formato de píxeles no es compatible.
+ * @throws std::runtime_error Si no se puede abrir el archivo de salida o si el formato de píxeles no es compatible.
+ */
 int maxlevelSOA(const ImageSOA& srcImage, const PPMMetadata& metadata, const int newMaxLevel, const std::string& outputPath) {
     // Verificar que los canales tengan el mismo tamaño
     const auto& red = std::get<std::vector<uint8_t>>(srcImage.redChannel);
@@ -45,6 +27,7 @@ int maxlevelSOA(const ImageSOA& srcImage, const PPMMetadata& metadata, const int
         std::cerr << "Error: Los canales de color no tienen el mismo tamaño\n";
         return 1;
     }
+    std::cout << "Cambiando el nivel máximo de intensidad de la imagen a " << newMaxLevel << '\n';
     // Convertir los valores de los píxeles
     std::vector<uint8_t> outRed(red.size());
     std::vector<uint8_t> outGreen(green.size());
@@ -55,6 +38,7 @@ int maxlevelSOA(const ImageSOA& srcImage, const PPMMetadata& metadata, const int
         outBlue[i] = static_cast<uint8_t>(blue[i] * newMaxLevel / metadata.max_value);
     }
     // Guardar la imagen
-    const ImageData imageData = { .red=outRed, .green=outGreen, .blue=outBlue, .metadata=metadata, .maxLevel=newMaxLevel };
-    return saveImage(imageData, outputPath);
+    const ImageSOA max_level_SOA = { .redChannel=outRed, .greenChannel=outGreen, .blueChannel=outBlue };
+    const PPMMetadata new_metadata = { .width=metadata.width, .height=metadata.height, .max_value=newMaxLevel };
+    return saveSOAtoPPM(max_level_SOA, new_metadata, newMaxLevel, outputPath);
 }
