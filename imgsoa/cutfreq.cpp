@@ -2,119 +2,125 @@
 // Created by mapor on 31/10/2024.
 //
 
-#include "cutfreq.hpp"
+#include "imagesoa.hpp"
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <limits>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <vector>
 
-ColorFrequencies contarFrecuencias(const ImageSOA& imagen, int width, int height) {
-  ColorFrequencies freqs;
-  const auto& red = std::get<std::vector<uint8_t>>(imagen.redChannel);
-  const auto& green = std::get<std::vector<uint8_t>>(imagen.greenChannel);
-  const auto& blue = std::get<std::vector<uint8_t>>(imagen.blueChannel);
+constexpr int MAX_COLOR_VALUE = 0xFF;
 
-  size_t const pixelCount = static_cast<size_t>(width) * static_cast<size_t>(height); // Multiplicación segura
-  for (size_t i = 0; i < pixelCount; ++i) { // Usamos size_t
-    if (red[i] > 0) { freqs.redCount++; }
-    if (green[i] > 0) { freqs.greenCount++; }
-    if (blue[i] > 0) { freqs.blueCount++; }
-  }
-  return freqs;
+// Combina los valores RGB en una única clave entera
+constexpr int combineRGB(int r, int g, int b) {
+    return (r << 16) | (g << BYTE_SIZE) | b;
 }
 
-void cutfreqSOA(const ImageSOA& imagen, const PPMMetadata& metadata, const std::string& outputPath, const ColorFrequencies& freqs ) {
-  // Determinar el canal con la mayor y la menor frecuencia
-  int const maxFreq = std::max({ freqs.redCount, freqs.greenCount, freqs.blueCount });
-  int const minFreq = std::min({ freqs.redCount, freqs.greenCount, freqs.blueCount });
+// Contar frecuencia de cada color en la imagen SOA
+void countColorFrequency(const ImageSOA& srcImage,
+                         std::unordered_map<int, int>& colorFrequency) {
+    if (std::holds_alternative<std::vector<uint8_t>>(srcImage.redChannel)) {
+        const auto& red = std::get<std::vector<uint8_t>>(srcImage.redChannel);
+        const auto& green = std::get<std::vector<uint8_t>>(srcImage.greenChannel);
+        const auto& blue = std::get<std::vector<uint8_t>>(srcImage.blueChannel);
 
-  auto red = std::get<std::vector<uint8_t>>(imagen.redChannel);
-  auto green = std::get<std::vector<uint8_t>>(imagen.greenChannel);
-  auto blue = std::get<std::vector<uint8_t>>(imagen.blueChannel);
-
-  // Determinar qué canal es el de origen y cuál es el de destino
-  const std::vector<uint8_t>* sourceChannel = nullptr;
-  std::vector<unsigned char> *targetChannel = nullptr;
-
-  if (freqs.redCount == maxFreq) { sourceChannel = &red;
-  } else if (freqs.greenCount == maxFreq) { sourceChannel = &green;
-  } else { sourceChannel = &blue; }
-
-  if (freqs.redCount == minFreq) { targetChannel = &red;
-  } else if (freqs.greenCount == minFreq) { targetChannel = &green;
-  } else { targetChannel = &blue; }
-  size_t const pixelCount = static_cast<size_t>(metadata.width) * static_cast<size_t>(metadata.height); // Multiplicación segura
-  // Reemplazar los valores del canal menos frecuente con los del canal más frecuente
-  for (size_t i = 0; i < pixelCount; ++i) { // Usamos size_t
-    (*targetChannel)[i] = (*sourceChannel)[i];
-  }
-    saveImageSOAToPPM(imagen, metadata, outputPath);
-}
-
-struct ColorChannels8Bit {
-    std::vector<uint8_t> red;
-    std::vector<uint8_t> green;
-    std::vector<uint8_t> blue;
-};
-struct ColorChannels16Bit {
-    std::vector<uint16_t> red;
-    std::vector<uint16_t> green;
-    std::vector<uint16_t> blue;
-};
-void writePPMHeader(std::ofstream& outFile, const PPMMetadata& metadata) {
-    outFile << "P6\n" << metadata.width << " " << metadata.height << "\n" << metadata.max_value << "\n";
-}
-void writeData8Bit(std::ofstream& outFile, const ColorChannels8Bit& channels, const size_t pixelCount) {
-    for (size_t i = 0; i < pixelCount; ++i) {
-        outFile.put(static_cast<char>(channels.red[i]));
-        outFile.put(static_cast<char>(channels.green[i]));
-        outFile.put(static_cast<char>(channels.blue[i]));
-    }
-}
-void writeData16Bit(std::ofstream& outFile, const ColorChannels16Bit& channels, const size_t pixelCount) {
-    for (size_t i = 0; i < pixelCount; ++i) {
-        outFile.put(static_cast<char>(channels.red[i] >> BYTE_SIZE));      // Byte alto
-        outFile.put(static_cast<char>(channels.red[i] & HEX_VAL));         // Byte bajo
-        outFile.put(static_cast<char>(channels.green[i] >> BYTE_SIZE));    // Byte alto
-        outFile.put(static_cast<char>(channels.green[i] & HEX_VAL));       // Byte bajo
-        outFile.put(static_cast<char>(channels.blue[i] >> BYTE_SIZE));     // Byte alto
-        outFile.put(static_cast<char>(channels.blue[i] & HEX_VAL));        // Byte bajo
-    }
-}
-void saveImageSOAToPPM(const ImageSOA& image, const PPMMetadata& metadata, const std::string& outputPath) {
-    std::ofstream outFile(outputPath, std::ios::binary);
-    if (!outFile) {
-        std::cerr << "Error al abrir el archivo para escritura: " << outputPath << '\n';
-        return;
-    }
-
-    writePPMHeader(outFile, metadata);
-
-    size_t const pixelCount = static_cast<size_t>(metadata.width) * metadata.height;
-
-    if (std::holds_alternative<std::vector<uint8_t>>(image.redChannel) &&
-        std::holds_alternative<std::vector<uint8_t>>(image.greenChannel) &&
-        std::holds_alternative<std::vector<uint8_t>>(image.blueChannel)) {
-
-        ColorChannels8Bit const channels {
-            .red=std::get<std::vector<uint8_t>>(image.redChannel),
-            .green=std::get<std::vector<uint8_t>>(image.greenChannel),
-            .blue=std::get<std::vector<uint8_t>>(image.blueChannel)
-        };
-        writeData8Bit(outFile, channels, pixelCount);
-
-    } else if (std::holds_alternative<std::vector<uint16_t>>(image.redChannel) &&
-               std::holds_alternative<std::vector<uint16_t>>(image.greenChannel) &&
-               std::holds_alternative<std::vector<uint16_t>>(image.blueChannel)) {
-
-        ColorChannels16Bit const channels {
-            .red=std::get<std::vector<uint16_t>>(image.redChannel),
-            .green=std::get<std::vector<uint16_t>>(image.greenChannel),
-            .blue=std::get<std::vector<uint16_t>>(image.blueChannel)
-        };
-        writeData16Bit(outFile, channels, pixelCount);
-
+        for (size_t i = 0; i < red.size(); ++i) {
+            int key = combineRGB(red[i], green[i], blue[i]);
+            colorFrequency[key]++;
+        }
     } else {
-        std::cerr << "Error: Tipo de canal de color no compatible.\n";
-        return;
+        const auto& red = std::get<std::vector<uint16_t>>(srcImage.redChannel);
+        const auto& green = std::get<std::vector<uint16_t>>(srcImage.greenChannel);
+        const auto& blue = std::get<std::vector<uint16_t>>(srcImage.blueChannel);
+
+        for (size_t i = 0; i < red.size(); ++i) {
+            int key = combineRGB(red[i], green[i], blue[i]);
+            colorFrequency[key]++;
+        }
+    }
+}
+
+// Reemplaza los colores en la imagen SOA según el mapa de reemplazo
+void applyColorReplacement(
+        ImageSOA& srcImage,
+        const std::unordered_map<int, std::tuple<int, int, int>>& replacementMap) {
+    if (std::holds_alternative<std::vector<uint8_t>>(srcImage.redChannel)) {
+        auto& red = std::get<std::vector<uint8_t>>(srcImage.redChannel);
+        auto& green = std::get<std::vector<uint8_t>>(srcImage.greenChannel);
+        auto& blue = std::get<std::vector<uint8_t>>(srcImage.blueChannel);
+
+        for (size_t i = 0; i < red.size(); ++i) {
+            int key = combineRGB(red[i], green[i], blue[i]);
+            if (replacementMap.find(key) != replacementMap.end()) {
+                auto [newR, newG, newB] = replacementMap.at(key);
+                red[i] = static_cast<uint8_t>(newR);
+                green[i] = static_cast<uint8_t>(newG);
+                blue[i] = static_cast<uint8_t>(newB);
+            }
+        }
+    } else {
+        auto& red = std::get<std::vector<uint16_t>>(srcImage.redChannel);
+        auto& green = std::get<std::vector<uint16_t>>(srcImage.greenChannel);
+        auto& blue = std::get<std::vector<uint16_t>>(srcImage.blueChannel);
+
+        for (size_t i = 0; i < red.size(); ++i) {
+            int key = combineRGB(red[i], green[i], blue[i]);
+            if (replacementMap.find(key) != replacementMap.end()) {
+                auto [newR, newG, newB] = replacementMap.at(key);
+                red[i] = static_cast<uint16_t>(newR);
+                green[i] = static_cast<uint16_t>(newG);
+                blue[i] = static_cast<uint16_t>(newB);
+            }
+        }
+    }
+}
+
+// Función principal cutfreq para procesar la imagen SOA
+void cutfreqSOA(ImageSOA& srcImage, const PPMMetadata& metadata, int nColores,
+             const std::string& outputPath) {
+    std::unordered_map<int, int> colorFrequency;
+    countColorFrequency(srcImage, colorFrequency);
+
+    // Convertir mapa de frecuencias a vector y ordenar
+    std::vector<std::tuple<int, int, int, int>> colorData; // {frecuencia, r, g, b}
+    for (const auto& [key, frequency] : colorFrequency) {
+        int r = (key >> 16) & MAX_COLOR_VALUE;
+        int g = (key >> BYTE_SIZE) & MAX_COLOR_VALUE;
+        int b = key & MAX_COLOR_VALUE;
+        colorData.emplace_back(frequency, r, g, b);
+    }
+    std::sort(colorData.begin(), colorData.end(),
+              [](const auto& a, const auto& b) { return std::get<0>(a) < std::get<0>(b); });
+
+    // Convertir nColores a size_t para evitar conflictos de signo
+    size_t nColoresSize = static_cast<size_t>(nColores);
+
+    // Dividir colores
+    std::unordered_map<int, std::tuple<int, int, int>> replacementMap;
+    for (size_t i = 0; i < nColoresSize && i < colorData.size(); ++i) {
+        int freqRem, rRem, gRem, bRem;
+        std::tie(freqRem, rRem, gRem, bRem) = colorData[i];
+        int remKey = combineRGB(rRem, gRem, bRem);
+
+        // Buscar color más cercano para reemplazar
+        double minDistance = std::numeric_limits<double>::max();
+        std::tuple<int, int, int> closestColor;
+        for (size_t j = nColoresSize; j < colorData.size(); ++j) {
+            int _, rKeep, gKeep, bKeep;
+            std::tie(_, rKeep, gKeep, bKeep) = colorData[j];
+            double distance = std::sqrt(std::pow(rRem - rKeep, 2) + std::pow(gRem - gKeep, 2) +
+                                        std::pow(bRem - bKeep, 2));
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestColor = std::make_tuple(rKeep, gKeep, bKeep);
+            }
+        }
+        replacementMap[remKey] = closestColor;
     }
 
-    outFile.close();
-    std::cout << "Imagen guardada en: " << outputPath << '\n';
+    applyColorReplacement(srcImage, replacementMap);
+    saveSOAtoPPM(srcImage, metadata, metadata.max_value, outputPath);
 }
