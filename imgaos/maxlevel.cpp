@@ -4,43 +4,50 @@
 
 #include "maxlevel.hpp"
 
-namespace {
-    std::vector<Pixel8> convertPixels(const ImageAOS& srcImage, const int newMaxLevel, const PPMMetadata& metadata) {
-        const auto& pixels8 = std::get<std::vector<Pixel8>>(srcImage.pixels);
-        std::vector<Pixel8> out_pixels8(pixels8.size());
-        for (size_t index = 0; index < pixels8.size(); ++index) {
-            const auto& [r, g, b] = pixels8[index];
-            out_pixels8[index].r = static_cast<uint8_t>(r * newMaxLevel / metadata.max_value);
-            out_pixels8[index].g = static_cast<uint8_t>(g * newMaxLevel / metadata.max_value);
-            out_pixels8[index].b = static_cast<uint8_t>(b * newMaxLevel / metadata.max_value);
-        }
-        return out_pixels8;
-    }
-    int saveImage(const std::vector<Pixel8>& pixels, const PPMMetadata& metadata, const int newMaxLevel, const std::string& outputPath) {
-    std::ofstream outFile(outputPath, std::ios::binary);
-    if (!outFile.is_open()) {
-        std::cerr << "No se pudo abrir el archivo de salida" << '\n';
-        return 1;
-    }
 
-    // Escribir el encabezado
-    outFile << "P6\n" << metadata.width << " " << metadata.height << "\n" << newMaxLevel << "\n";
-
-    // Escribir los valores de los píxeles en el formato binario
-    for (const auto& [r, g, b] : pixels) {
-        outFile.put(static_cast<char>(r));
-        outFile.put(static_cast<char>(g));
-        outFile.put(static_cast<char>(b));
-    }
-
-    outFile.close();
-    std::cout << "La imagen con el nuevo nivel máximo de intensidad se ha guardado en " << outputPath << '\n';
-    return 0;
-}
-}
-
-// Función principal refactorizada
+/**
+ * @brief Changes the maximum pixel level of an image in AOS format and saves it in PPM.
+ *
+ * This function takes an image in AOS (Array of Structures) format and saves it to a file
+ * in PPM (P6) format. The function can handle images with 8-bit or 16-bit pixels.
+ * If a 16-bit pixel image is provided, the pixels are converted to 8 bits
+ * by scaling their values according to the specified new maximum level.
+ *
+ * @param srcImage The image in AOS format.
+ * @param metadata Metadata of the image.
+ * @param newMaxLevel The new maximum level of the pixels.
+ * @param outputPath The path where the image with the new maximum level will be saved.
+ * @return int 0 if the image was saved successfully, 1 if there was an error opening the file or
+ *             if the pixel format is not supported.
+ * @throws std::runtime_error If the output file cannot be opened or if the pixel format is not supported.
+ */
 int maxlevelAOS(const ImageAOS& srcImage, const PPMMetadata& metadata, const int newMaxLevel, const std::string& outputPath) {
-    const auto out_pixels8 = convertPixels(srcImage, newMaxLevel, metadata);
-    return saveImage(out_pixels8, metadata, newMaxLevel, outputPath);
+    ImageAOS max_level_AOS;
+    // Cambiar el nivel máximo de los píxeles
+    if (std::holds_alternative<std::vector<Pixel8>>(srcImage.pixels)) {
+        const auto& srcPixels = std::get<std::vector<Pixel8>>(srcImage.pixels);
+        std::vector<Pixel8> out_pixels(srcPixels.size());
+        for (size_t index = 0; index < srcPixels.size(); ++index) {
+            const auto& [r, g, b] = srcPixels[index];
+            out_pixels[index].r = static_cast<uint8_t>(r * newMaxLevel / metadata.max_value);
+            out_pixels[index].g = static_cast<uint8_t>(g * newMaxLevel / metadata.max_value);
+            out_pixels[index].b = static_cast<uint8_t>(b * newMaxLevel / metadata.max_value);
+        }
+        max_level_AOS.pixels = std::move(out_pixels);
+    } else if (std::holds_alternative<std::vector<Pixel16>>(srcImage.pixels)) {
+        const auto& srcPixels = std::get<std::vector<Pixel16>>(srcImage.pixels);
+        std::vector<Pixel16> out_pixels(srcPixels.size());
+        for (size_t index = 0; index < srcPixels.size(); ++index) {
+            const auto& [r, g, b] = srcPixels[index];
+            out_pixels[index].r = static_cast<uint16_t>(r * newMaxLevel / metadata.max_value);
+            out_pixels[index].g = static_cast<uint16_t>(g * newMaxLevel / metadata.max_value);
+            out_pixels[index].b = static_cast<uint16_t>(b * newMaxLevel / metadata.max_value);
+        }
+        max_level_AOS.pixels = std::move(out_pixels);
+    } else {
+        throw std::runtime_error("Unsupported pixel format");
+    }
+    // Guardar la imagen con el nuevo nivel máximo
+    saveAOStoPPM(max_level_AOS, metadata, newMaxLevel, outputPath);
+    return 0;
 }

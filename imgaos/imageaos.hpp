@@ -39,5 +39,6 @@ struct ImageAOS {
 ImageAOS cargarPixels8(std::ifstream& archivo, size_t num_pixels);
 ImageAOS cargarPixels16(std::ifstream& archivo, size_t num_pixels);
 ImageAOS cargarImagenPPM(const std::string& nombre_archivo, PPMMetadata& metadata);
+int saveAOStoPPM(const ImageAOS& srcImage, const PPMMetadata& metadata, int newMaxLevel, const std::string& outputPath);
 
 #endif //IMAGEAOS_HPP
