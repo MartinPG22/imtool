@@ -24,6 +24,7 @@ template<typename T>
 T getPixel(const std::vector<T>& pixels, size_t width, size_t hor, size_t ver) {
     return pixels[(ver * width) + hor];
 }
+
 template<typename T>
 std::vector<T> resizePixels(const std::vector<T>& srcPixels, const PPMMetadata& metadata, size_t newWidth, size_t newHeight) {
     std::vector<T> dstPixels(newWidth * newHeight);
@@ -60,6 +61,7 @@ std::vector<T> resizePixels(const std::vector<T>& srcPixels, const PPMMetadata& 
     }
     return dstPixels;
 }
+
 
 // Declaraciones de las nuevas funciones
 void savePixelsToPPM8(const std::string& outputPath, const std::vector<Pixel8>& pixels, const std::vector<size_t>& newSize, size_t intensidad);
