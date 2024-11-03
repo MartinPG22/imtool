@@ -2,11 +2,11 @@
 // Created by mapor on 29/10/2024.
 //
 
-#ifndef COMPRESS_HPP
-#define COMPRESS_HPP
-/*
-#include "imagesoa.hpp"
+#ifndef COMPRESS_SOA_HPP
+#define COMPRESS_SOA_HPP
 
+#include "imagesoa.hpp"
+/*
 template <typename T>
 struct Color {
   std::array<T, 3> components; // Usar un array para almacenar los componentes
@@ -20,10 +20,10 @@ struct Color {
   T b() const { return components[2]; }
 };
 // Puedes definir el constructor aquí o en el archivo .cpp
-
+*/
 void writeCPPM(const ImageSOA& image, const std::string& filename, const PPMMetadata& metadata) ;
+/*
 bool operator==(const Pixel8& lhs, const Pixel8& rhs);
 bool operator==(const Pixel16& lhs, const Pixel16& rhs);
 */
-
-#endif //COMPRESS_HPP
+#endif //COMPRESS_SOA_HPP

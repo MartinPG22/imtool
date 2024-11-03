@@ -5,19 +5,11 @@
 
 #include "progargs.hpp"
 
-#include "binaryio.hpp"
-#include "./imgaos/imageaos.hpp"
-#include "./imgsoa/imagesoa.hpp"
-
-#include "../imgaos/compress.hpp"
-#include "../imgaos/cutfreq.hpp"
-#include "../imgsoa/cutfreq.hpp"
-
 
 bool isInteger(const std::string& integer) {
     return std::regex_match(integer, std::regex("-?[0-9]+"));
 }
-int executeInfo(const std::vector<std::string>& arguments, PPMMetadata& metadata) {
+int executeInfo(const std::vector<std::string>& arguments, const PPMMetadata& metadata) {
     const std::string& inputPath = arguments[0];
     const std::string& outputPath = arguments[1];
     const std::string& operation = arguments[2];
@@ -59,8 +51,7 @@ int executeMaxlevel(const std::vector<std::string>& arguments, PPMMetadata& meta
         return -1;
     }
     try {
-        int const newMaxLevel = std::stoi(arguments[3]);
-        if(0>newMaxLevel || newMaxLevel>MAX_NEW_LEVEL){
+        if(int const newMaxLevel = std::stoi(arguments[3]); 0>newMaxLevel || newMaxLevel>MAX_NEW_LEVEL){
             std::cerr << "Error: Invalid maxlevel: " << arguments[3] << '\n';
             return -1;
         }
@@ -69,15 +60,15 @@ int executeMaxlevel(const std::vector<std::string>& arguments, PPMMetadata& meta
         return -1;
     }
     std::cout << "Executing 'maxlevel' operation with level on: " << inputPath << '\n';
+    int res = 0;
     if (method == "aos") {
         ImageAOS const imagensrcAOS = cargarImagenPPM(inputPath, metadata);
-        maxlevel(imagensrcAOS, metadata, std::stoi(arguments[3]), outputPath);
+        res = maxlevelAOS(imagensrcAOS, metadata, std::stoi(arguments[3]), outputPath);
     } else if (method == "soa") {
         ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
-        //imprimirImagenSOA(imagensrcSOA, metadata);
-        //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
+        res = maxlevelSOA(imagensrcSOA, metadata, std::stoi(arguments[3]), outputPath);
     }
-    return 0;
+    return res;
 }
 
 int argumentsResize(const std::vector<std::string>& arguments) {
@@ -165,7 +156,7 @@ int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metad
         // Contar frecuencias de cada canal
         ColorFrequencies const freqs = contarFrecuencias(imagensrcSOA, static_cast<int>(metadata.width), static_cast<int>(metadata.height));
         // Reemplazar colores
-        cutfreqAOS(imagensrcSOA,metadata, outputPath, freqs);
+        cutfreqSOA(imagensrcSOA,metadata, outputPath, freqs);
 
     }
     std::cout << "Executing 'cutfreq' operation with number of colors: " << numberOfColors << " on: " << inputPath << '\n';

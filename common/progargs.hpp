@@ -6,11 +6,12 @@
 #define PROGARGS_HPP
 
 #include "binaryio.hpp"
-// #include "binaryio.cpp"
-#include "./imgaos/imageaos.hpp"
-// #include "./imgaos/imageaos.cpp"
-#include "./imgsoa/imagesoa.hpp"
-// #include "./imgsoa/imagesoa.cpp"
+
+#include "../imgaos/imageaos.hpp"
+#include "../imgaos/maxlevel.hpp"
+#include "../imgaos/resize.hpp"
+#include "../imgaos/compress.hpp"
+#include "../imgaos/cutfreq.hpp"
 
 #include <iostream>
 #include <string>
@@ -18,11 +19,11 @@
 #include <regex>
 #include <filesystem>  // Para trabajar con rutas de archivo
 
-#include "../imgaos/maxlevel.hpp"
-#include "../imgaos/resize.hpp"
-// #include "../imgaos/compress.cpp"
-// #include "../imgaos/cutfreq.cpp"
-// #include "../imgsoa/cutfreq.cpp"
+#include "../imgsoa/imagesoa.hpp"
+#include "../imgsoa/maxlevel.hpp"
+//#include "../imgsoa/resize.hpp"
+#include "../imgsoa/cutfreq.hpp"
+#include "../imgsoa/compress.hpp"
 
 constexpr size_t ARG_RESIZE = 5;
 constexpr int MAX_NEW_LEVEL = 65535;
@@ -31,7 +32,7 @@ bool isInteger(const std::string& integer);
 
 
 int executeOperation(const std::vector<std::string>& arguments,const std::string& method);
-int executeInfo(const std::vector<std::string>& arguments, PPMMetadata& metadata);
+int executeInfo(const std::vector<std::string>& arguments, const PPMMetadata& metadata);
 int executeMaxlevel(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method);
 int executeResize(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method);
 int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method);

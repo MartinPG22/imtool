@@ -2,12 +2,17 @@
 // Created by asanch on 10/19/24.
 //
 
-#ifndef MAXLEVEL_HPP
-# define MAXLEVEL_HPP
+#ifndef MAXLEVEL_AOS_HPP
+# define MAXLEVEL_AOS_HPP
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cstdint>
 
 #include "imageaos.hpp"
 
-int maxlevel(const ImageAOS& srcImage,
+int maxlevelAOS(const ImageAOS& srcImage,
     const PPMMetadata& metadata, int newMaxLevel, const std::string& outputPath);
 
-#endif //MAXLEVEL_HPP
+#endif //MAXLEVEL_AOS_HPP

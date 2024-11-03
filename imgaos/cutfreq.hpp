@@ -2,8 +2,8 @@
 // Created by mapor on 29/10/2024.
 //
 
-#ifndef CUTFREQ_HPP
-#define CUTFREQ_HPP
+#ifndef CUTFREQ_AOS_HPP
+#define CUTFREQ_AOS_HPP
 
 #include "imageaos.hpp"
 #include "compress.hpp"
@@ -45,4 +45,4 @@ Color<int> findClosestColor(const Color<int>& colorRem, const std::vector<std::t
 void createReplacementMap(const ColorGroups& colorGroups,
                           std::unordered_map<int, Color<int>>& replacementMap);
 void applyColorReplacement(ImageAOS& srcImage, const std::unordered_map<int, Color<int>>& replacementMap);
-#endif //CUTFREQ_HPP
+#endif //CUTFREQ_AOS_HPP

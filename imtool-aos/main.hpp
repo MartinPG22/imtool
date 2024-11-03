@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include <span>
-#include "../common/progargs.hpp"  // Incluir la cabecera de la función
+#include "../common/progargs.hpp"
 
 int main(int argc, char* argv[]); // Declaración de la función principal
 

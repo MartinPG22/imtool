@@ -2,8 +2,8 @@
 // Created by mapor on 26/10/2024.
 //
 
-#ifndef COMPRESS_HPP
-#define COMPRESS_HPP
+#ifndef COMPRESS_AOS_HPP
+#define COMPRESS_AOS_HPP
 #include "imageaos.hpp"
 #include "./common/binaryio.hpp"
 
@@ -37,4 +37,4 @@ bool operator==(const Pixel8& lhs, const Pixel8& rhs);
 bool operator==(const Pixel16& lhs, const Pixel16& rhs);
 size_t writeHeader(std::ofstream& file, const PPMMetadata& metadata, size_t colorCount);
 void finish(std::vector<uint8_t> buffer, std::ofstream& file, const std::string& filename);
-#endif //COMPRESS_HPP
+#endif //COMPRESS_AOS_HPP

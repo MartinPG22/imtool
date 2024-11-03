@@ -2,8 +2,8 @@
 // Created by mapor on 31/10/2024.
 //
 
-#ifndef CUTFREQAOS_HPP
-#define CUTFREQAOS_HPP
+#ifndef CUTFREQ_SOA_HPP
+#define CUTFREQ_SOA_HPP
 
 #include <iostream>
 #include <fstream>
@@ -20,6 +20,6 @@ struct ColorFrequencies {
 };
 constexpr int HEX_VAL = 0xFF;
 ColorFrequencies contarFrecuencias(const ImageSOA& imagen, int width, int height);
-void cutfreqAOS(const ImageSOA& imagen, const PPMMetadata& metadata, const std::string& outputPath, const ColorFrequencies& freqs );
+void cutfreqSOA(const ImageSOA& imagen, const PPMMetadata& metadata, const std::string& outputPath, const ColorFrequencies& freqs );
 void saveImageSOAToPPM(const ImageSOA& image, const PPMMetadata& metadata, const std::string& outputPath);
-#endif //CUTFREQAOS_HPP
+#endif //CUTFREQ_SOA_HPP

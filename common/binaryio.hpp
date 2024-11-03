@@ -11,7 +11,7 @@
 #include <string>
 
 
-const int MAX_16 = 65535;
+constexpr int MAX_16 = 65535;
 
 // Estructura para almacenar los metadatos de la imagen
 struct PPMMetadata {
