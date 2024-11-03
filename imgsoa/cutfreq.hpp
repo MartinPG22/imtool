@@ -24,4 +24,13 @@ void applyColorReplacement(ImageSOA& srcImage, const std::unordered_map<int, std
 void cutfreqSOA(ImageSOA& srcImage, const PPMMetadata& metadata, int nColores, const std::string& outputPath);
 void saveImageSOAToPPM(const ImageSOA& image, const PPMMetadata& metadata, const std::string& outputPath);
 constexpr int combineRGB(int red, int green, int blue);
+std::vector<std::tuple<int, int, int, int>> getColorData(const std::unordered_map<int, int>& colorFrequency);
+std::tuple<int, int, int> findClosestReplacement(const std::tuple<int, int, int>& targetColor,
+                                                 const std::vector<std::tuple<int, int, int, int>>& colorData,
+                                                 size_t startIdx);
+std::unordered_map<int, std::tuple<int, int, int>> createReplacementMap(
+    const std::vector<std::tuple<int, int, int, int>>& colorData, int nColores);
+void applyReplacementsAndSave(ImageSOA& srcImage,
+                              const std::unordered_map<int, std::tuple<int, int, int>>& replacementMap,
+                              const PPMMetadata& metadata, const std::string& outputPath);
 #endif // CUTFREQ_SOA_HPP

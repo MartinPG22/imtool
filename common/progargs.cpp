@@ -183,7 +183,7 @@ int executeCompress(const std::vector<std::string>& arguments, PPMMetadata& meta
     } else if (method == "soa") {
         ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
         //imprimirImagenSOA(imagensrcSOA, metadata);
-        //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
+        writeCPPMSOA(imagensrcSOA, outputPath, metadata);
     }
     std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
     return 0;
