@@ -11,12 +11,12 @@
 #include <tuple>
 #include <unordered_map>
 #include <vector>
+#include "cutfreq.hpp"
 
-constexpr int MAX_COLOR_VALUE = 0xFF;
 
 // Combina los valores RGB en una única clave entera
-constexpr int combineRGB(int r, int g, int b) {
-    return (r << 16) | (g << BYTE_SIZE) | b;
+constexpr int combineRGB(int red, int green, int blue) {
+    return (red << changeBits16) | (green << BYTE_SIZE) | blue;
 }
 
 // Contar frecuencia de cada color en la imagen SOA
@@ -28,7 +28,7 @@ void countColorFrequency(const ImageSOA& srcImage,
         const auto& blue = std::get<std::vector<uint8_t>>(srcImage.blueChannel);
 
         for (size_t i = 0; i < red.size(); ++i) {
-            int key = combineRGB(red[i], green[i], blue[i]);
+            int const key = combineRGB(red[i], green[i], blue[i]);
             colorFrequency[key]++;
         }
     } else {
@@ -37,7 +37,7 @@ void countColorFrequency(const ImageSOA& srcImage,
         const auto& blue = std::get<std::vector<uint16_t>>(srcImage.blueChannel);
 
         for (size_t i = 0; i < red.size(); ++i) {
-            int key = combineRGB(red[i], green[i], blue[i]);
+            int const key = combineRGB(red[i], green[i], blue[i]);
             colorFrequency[key]++;
         }
     }
@@ -53,7 +53,7 @@ void applyColorReplacement(
         auto& blue = std::get<std::vector<uint8_t>>(srcImage.blueChannel);
 
         for (size_t i = 0; i < red.size(); ++i) {
-            int key = combineRGB(red[i], green[i], blue[i]);
+            int const key = combineRGB(red[i], green[i], blue[i]);
             if (replacementMap.find(key) != replacementMap.end()) {
                 auto [newR, newG, newB] = replacementMap.at(key);
                 red[i] = static_cast<uint8_t>(newR);
@@ -67,7 +67,7 @@ void applyColorReplacement(
         auto& blue = std::get<std::vector<uint16_t>>(srcImage.blueChannel);
 
         for (size_t i = 0; i < red.size(); ++i) {
-            int key = combineRGB(red[i], green[i], blue[i]);
+            int const key = combineRGB(red[i], green[i], blue[i]);
             if (replacementMap.find(key) != replacementMap.end()) {
                 auto [newR, newG, newB] = replacementMap.at(key);
                 red[i] = static_cast<uint16_t>(newR);
@@ -87,31 +87,37 @@ void cutfreqSOA(ImageSOA& srcImage, const PPMMetadata& metadata, int nColores,
     // Convertir mapa de frecuencias a vector y ordenar
     std::vector<std::tuple<int, int, int, int>> colorData; // {frecuencia, r, g, b}
     for (const auto& [key, frequency] : colorFrequency) {
-        int r = (key >> 16) & MAX_COLOR_VALUE;
-        int g = (key >> BYTE_SIZE) & MAX_COLOR_VALUE;
-        int b = key & MAX_COLOR_VALUE;
-        colorData.emplace_back(frequency, r, g, b);
+        int const red = (key >> 16) & MAX_COLOR_VALUE;
+        int const green = (key >> BYTE_SIZE) & MAX_COLOR_VALUE;
+        int const blue = key & MAX_COLOR_VALUE;
+        colorData.emplace_back(frequency, red, green, blue);
     }
     std::sort(colorData.begin(), colorData.end(),
-              [](const auto& a, const auto& b) { return std::get<0>(a) < std::get<0>(b); });
+              [](const auto& tupla1, const auto& tupla2) { return std::get<0>(tupla1) < std::get<0>(tupla2); });
 
     // Convertir nColores a size_t para evitar conflictos de signo
-    size_t nColoresSize = static_cast<size_t>(nColores);
+    auto nColoresSize = static_cast<size_t>(nColores);
 
     // Dividir colores
     std::unordered_map<int, std::tuple<int, int, int>> replacementMap;
     for (size_t i = 0; i < nColoresSize && i < colorData.size(); ++i) {
-        int freqRem, rRem, gRem, bRem;
+        int freqRem = 0;
+        int rRem = 0;
+        int gRem = 0;
+        int bRem = 0;
         std::tie(freqRem, rRem, gRem, bRem) = colorData[i];
-        int remKey = combineRGB(rRem, gRem, bRem);
+        int const remKey = combineRGB(rRem, gRem, bRem);
 
         // Buscar color más cercano para reemplazar
         double minDistance = std::numeric_limits<double>::max();
         std::tuple<int, int, int> closestColor;
         for (size_t j = nColoresSize; j < colorData.size(); ++j) {
-            int _, rKeep, gKeep, bKeep;
-            std::tie(_, rKeep, gKeep, bKeep) = colorData[j];
-            double distance = std::sqrt(std::pow(rRem - rKeep, 2) + std::pow(gRem - gKeep, 2) +
+            int ignored = 0;
+            int rKeep = 0;
+            int gKeep = 0;
+            int bKeep = 0;
+            std::tie(ignored, rKeep, gKeep, bKeep) = colorData[j];
+            double const distance = std::sqrt(std::pow(rRem - rKeep, 2) + std::pow(gRem - gKeep, 2) +
                                         std::pow(bRem - bKeep, 2));
             if (distance < minDistance) {
                 minDistance = distance;

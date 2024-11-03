@@ -11,10 +11,6 @@
 #include "imageaos.hpp" // Asegúrate de que este archivo existe y es accesible
 #include "./common/binaryio.hpp" // Asegúrate de que este archivo existe y es accesible
 
-
-
-constexpr uint8_t MIN_PIXEL_VALUE = 8;
-
 uint8_t interpolate8(uint8_t v00, uint8_t v01, float ttt);
 uint16_t interpolate16(uint16_t v00, uint16_t v01, float ttt);
 Pixel16 interpolatePixel(const Pixel16& p00, const Pixel16& p01, float ttt);

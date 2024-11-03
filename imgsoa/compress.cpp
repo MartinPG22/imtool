@@ -91,11 +91,11 @@ void writeCPPMSOA(const ImageSOA& image, const std::string& filename, const PPMM
             constexpr int B_LSB = 4;
             constexpr int B_MSB = 5;
             std::array<uint8_t, size_6> rgb{};
-            rgb[R_LSB] = static_cast<uint8_t>(rTabla & HEX_VAL);       // LSB de R
+            rgb[R_LSB] = static_cast<uint8_t>(rTabla & MAX_PIXEL_VALUE);       // LSB de R
             rgb[R_MSB] = static_cast<uint8_t>(rTabla >> BYTE_SIZE);    // MSB de R
-            rgb[G_LSB] = static_cast<uint8_t>(gTabla & HEX_VAL);       // LSB de G
+            rgb[G_LSB] = static_cast<uint8_t>(gTabla & MAX_PIXEL_VALUE);       // LSB de G
             rgb[G_MSB] = static_cast<uint8_t>(gTabla >> BYTE_SIZE);    // MSB de G
-            rgb[B_LSB] = static_cast<uint8_t>(bTabla & HEX_VAL);       // LSB de B
+            rgb[B_LSB] = static_cast<uint8_t>(bTabla & MAX_PIXEL_VALUE);       // LSB de B
             rgb[B_MSB] = static_cast<uint8_t>(bTabla >> BYTE_SIZE);    // MSB de B
 
             // Usar un buffer temporal
@@ -125,7 +125,7 @@ void writeCPPMSOA(const ImageSOA& image, const std::string& filename, const PPMM
         } else if (pixelSize == 2) {
             // Para dos bytes
             std::array<uint8_t, 2> indexBytes = {
-                static_cast<uint8_t>(index & HEX_VAL),       // LSB
+                static_cast<uint8_t>(index & MAX_PIXEL_VALUE),       // LSB
                 static_cast<uint8_t>(index >> BYTE_SIZE)          // MSB
             };
 
@@ -136,10 +136,10 @@ void writeCPPMSOA(const ImageSOA& image, const std::string& filename, const PPMM
         } else {
             // Para cuatro bytes
             std::array<uint8_t, 4> indexBytes = {
-                static_cast<uint8_t>(index & HEX_VAL),         // LSB
-                static_cast<uint8_t>((index >> BYTE_SIZE) & HEX_VAL),
-                static_cast<uint8_t>((index >> BYTE_SIZE*2) & HEX_VAL),
-                static_cast<uint8_t>((index >> BYTE_SIZE*3) & HEX_VAL)
+                static_cast<uint8_t>(index & MAX_PIXEL_VALUE),         // LSB
+                static_cast<uint8_t>((index >> BYTE_SIZE) & MAX_PIXEL_VALUE),
+                static_cast<uint8_t>((index >> BYTE_SIZE*2) & MAX_PIXEL_VALUE),
+                static_cast<uint8_t>((index >> BYTE_SIZE*3) & MAX_PIXEL_VALUE)
             };
 
             // Usar un buffer temporal

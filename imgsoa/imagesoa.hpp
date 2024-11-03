@@ -15,8 +15,8 @@
 #include "./common/binaryio.hpp"
 
 
-constexpr int METATADATA_MAX_VALUE = 255;
-constexpr int BYTE_SIZE = 8;
+
+
 
 // Estructura que representa la imagen en formato SOA (Structure of Arrays)
 struct ImageSOA {
