@@ -77,7 +77,7 @@ ImageAOS cargarPixels16(std::ifstream& archivo, const size_t num_pixels) {
  * @param metadata Metadata of the image.
  * @return ImageAOS The image in AOS format or an empty image if the file cannot be opened.
  */
-ImageAOS cargarImagenPPM(const std::string& nombre_archivo, PPMMetadata& metadata) {
+ImageAOS cargarImagenPPMAOS(const std::string& nombre_archivo, PPMMetadata& metadata) {
     std::ifstream archivo(nombre_archivo, std::ios::binary);
     if (!archivo) {
         std::cerr << "Error: No se puede abrir el archivo." << '\n';
@@ -110,13 +110,13 @@ ImageAOS cargarImagenPPM(const std::string& nombre_archivo, PPMMetadata& metadat
  *
  * @param srcImage The image in AOS format.
  * @param metadata Metadata of the image.
- * @param newMaxLevel The new maximum level of the pixels.
+ * @param maxLevel The new maximum level of the pixels.
  * @param outputPath The path where the image with the new maximum level will be saved.
  * @return int 0 if the image was saved successfully, 1 if there was an error opening the file or
  *             if the pixel format is not supported.
  * @throws std::runtime_error If the output file cannot be opened or if the pixel format is not supported.
  */
-int saveAOStoPPM(const ImageAOS& srcImage, const PPMMetadata& metadata, const int newMaxLevel, const std::string& outputPath) {
+int saveAOStoPPM(const ImageAOS& srcImage, const PPMMetadata& metadata, const int maxLevel, const std::string& outputPath) {
     std::variant<std::vector<Pixel8>, std::vector<Pixel16>> const pixels = srcImage.pixels;
     // Abrir el archivo de salida
     std::ofstream outFile(outputPath, std::ios::binary);
@@ -125,7 +125,7 @@ int saveAOStoPPM(const ImageAOS& srcImage, const PPMMetadata& metadata, const in
         return 1;
     }
     // Escribir el encabezado
-    outFile << "P6\n" << metadata.width << " " << metadata.height << "\n" << newMaxLevel << "\n";
+    outFile << "P6\n" << metadata.width << " " << metadata.height << "\n" << maxLevel << "\n";
     // Escribir los valores de los píxeles en el formato binario
     if (std::holds_alternative<std::vector<Pixel8>>(pixels)) {
         const auto& pixelData = std::get<std::vector<Pixel8>>(pixels);
