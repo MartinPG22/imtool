@@ -43,8 +43,7 @@ void writeCPPMSOA(const ImageSOA& image, const std::string& filename, const PPMM
         int const red = redChannel[i];
         int const green = greenChannel[i];
         int const blue = blueChannel[i];
-        auto color = std::make_tuple(red, green, blue);
-        if (colorTable.find(color) == colorTable.end()) {
+        if (auto color = std::make_tuple(red, green, blue); !colorTable.contains(color)) {
             colorTable[color] = static_cast<uint32_t>(colorList.size());
             colorList.push_back(color);
         }
@@ -52,9 +51,9 @@ void writeCPPMSOA(const ImageSOA& image, const std::string& filename, const PPMM
 
     size_t const colorCount = colorList.size();
     size_t pixelSize = 0;
-    if (colorCount <= 256) {
+    if (constexpr size_t maxColorCount = 256; colorCount <= maxColorCount) {
         pixelSize = 1;
-    } else if (colorCount <= 65536) {
+    } else if (colorCount <= MAX_16) {
         pixelSize = 2;
     } else {
         pixelSize = 4;
@@ -81,20 +80,27 @@ void writeCPPMSOA(const ImageSOA& image, const std::string& filename, const PPMM
 
             // Usar un buffer temporal
             std::vector<char> buffer(rgb.size());
-            std::copy(rgb.begin(), rgb.end(), buffer.begin());
+            std::ranges::copy(rgb, buffer.begin());
             file.write(buffer.data(), static_cast<std::streamsize>(buffer.size())); // Conversión explícita
         } else {
-            std::array<uint8_t, 6> rgb{};
-            rgb[0] = static_cast<uint8_t>(rTabla & 0xFF);       // LSB de R
-            rgb[1] = static_cast<uint8_t>(rTabla >> 8);        // MSB de R
-            rgb[2] = static_cast<uint8_t>(gTabla & 0xFF);       // LSB de G
-            rgb[3] = static_cast<uint8_t>(gTabla >> 8);        // MSB de G
-            rgb[4] = static_cast<uint8_t>(bTabla & 0xFF);       // LSB de B
-            rgb[5] = static_cast<uint8_t>(bTabla >> 8);        // MSB de B
+            constexpr int size_6 = 6;
+            constexpr int R_LSB = 0;
+            constexpr int R_MSB = 1;
+            constexpr int G_LSB = 2;
+            constexpr int G_MSB = 3;
+            constexpr int B_LSB = 4;
+            constexpr int B_MSB = 5;
+            std::array<uint8_t, size_6> rgb{};
+            rgb[R_LSB] = static_cast<uint8_t>(rTabla & HEX_VAL);       // LSB de R
+            rgb[R_MSB] = static_cast<uint8_t>(rTabla >> BYTE_SIZE);    // MSB de R
+            rgb[G_LSB] = static_cast<uint8_t>(gTabla & HEX_VAL);       // LSB de G
+            rgb[G_MSB] = static_cast<uint8_t>(gTabla >> BYTE_SIZE);    // MSB de G
+            rgb[B_LSB] = static_cast<uint8_t>(bTabla & HEX_VAL);       // LSB de B
+            rgb[B_MSB] = static_cast<uint8_t>(bTabla >> BYTE_SIZE);    // MSB de B
 
             // Usar un buffer temporal
             std::vector<char> buffer(rgb.size());
-            std::copy(rgb.begin(), rgb.end(), buffer.begin());
+            std::ranges::copy(rgb, buffer.begin());
             file.write(buffer.data(), static_cast<std::streamsize>(buffer.size())); // Conversión explícita
         }
     }
@@ -119,30 +125,28 @@ void writeCPPMSOA(const ImageSOA& image, const std::string& filename, const PPMM
         } else if (pixelSize == 2) {
             // Para dos bytes
             std::array<uint8_t, 2> indexBytes = {
-                static_cast<uint8_t>(index & 0xFF),       // LSB
-                static_cast<uint8_t>(index >> 8)          // MSB
+                static_cast<uint8_t>(index & HEX_VAL),       // LSB
+                static_cast<uint8_t>(index >> BYTE_SIZE)          // MSB
             };
 
             // Usar un buffer temporal
             std::vector<char> buffer(indexBytes.size());
-            std::copy(indexBytes.begin(), indexBytes.end(), buffer.begin());
+            std::ranges::copy(indexBytes, buffer.begin());
             file.write(buffer.data(), static_cast<std::streamsize>(buffer.size())); // Conversión explícita
         } else {
             // Para cuatro bytes
             std::array<uint8_t, 4> indexBytes = {
-                static_cast<uint8_t>(index & 0xFF),         // LSB
-                static_cast<uint8_t>((index >> 8) & 0xFF),
-                static_cast<uint8_t>((index >> 16) & 0xFF),
-                static_cast<uint8_t>((index >> 24) & 0xFF)
+                static_cast<uint8_t>(index & HEX_VAL),         // LSB
+                static_cast<uint8_t>((index >> BYTE_SIZE) & HEX_VAL),
+                static_cast<uint8_t>((index >> BYTE_SIZE*2) & HEX_VAL),
+                static_cast<uint8_t>((index >> BYTE_SIZE*3) & HEX_VAL)
             };
 
             // Usar un buffer temporal
             std::vector<char> buffer(indexBytes.size());
-            std::copy(indexBytes.begin(), indexBytes.end(), buffer.begin());
+            std::ranges::copy(indexBytes, buffer.begin());
             file.write(buffer.data(), static_cast<std::streamsize>(buffer.size())); // Conversión explícita
         }
     }
-
-
     file.close();
 }

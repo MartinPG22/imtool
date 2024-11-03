@@ -6,6 +6,7 @@
 #define COMPRESS_SOA_HPP
 
 #include "imagesoa.hpp"
+#include "cutfreq.hpp"
 #include "./common/binaryio.hpp"
 #include <iostream>
 #include <fstream>
