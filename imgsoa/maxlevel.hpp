@@ -6,9 +6,9 @@
 #define MAXLEVEL_SOA_HPP
 
 #include <iostream>
-
 #include "imagesoa.hpp"
 
-int maxlevelSOA(const ImageSOA& srcImage, const PPMMetadata& metadata, int newMaxLevel, const std::string& outputPath);
+template <typename PixelType>
+int maxlevelSOA(const ImageSOA<PixelType>& srcImage, const PPMMetadata& metadata, int newMaxLevel, const std::string& outputPath);
 
 #endif //MAXLEVEL_SOA_HPP

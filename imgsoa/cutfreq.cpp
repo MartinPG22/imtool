@@ -4,11 +4,12 @@
 
 #include "cutfreq.hpp"
 
-ColorFrequencies contarFrecuencias(const ImageSOA& imagen, int width, int height) {
+template <typename PixelType>
+ColorFrequencies contarFrecuencias(const ImageSOA<PixelType> & imagen, int width, int height) {
   ColorFrequencies freqs;
-  const auto& red = std::get<std::vector<uint8_t>>(imagen.redChannel);
-  const auto& green = std::get<std::vector<uint8_t>>(imagen.greenChannel);
-  const auto& blue = std::get<std::vector<uint8_t>>(imagen.blueChannel);
+  const auto& red = imagen.redChannel;
+  const auto& green = imagen.greenChannel;
+  const auto& blue = imagen.blueChannel;
 
   size_t const pixelCount = static_cast<size_t>(width) * static_cast<size_t>(height); // Multiplicación segura
   for (size_t i = 0; i < pixelCount; ++i) { // Usamos size_t
@@ -19,30 +20,31 @@ ColorFrequencies contarFrecuencias(const ImageSOA& imagen, int width, int height
   return freqs;
 }
 
-void cutfreqSOA(const ImageSOA& imagen, const PPMMetadata& metadata, const std::string& outputPath, const ColorFrequencies& freqs ) {
+template <typename PixelType>
+void cutfreqSOA(const ImageSOA<PixelType>& imagen, const PPMMetadata& metadata, const std::string& outputPath, const ColorFrequencies& freqs ) {
   // Determinar el canal con la mayor y la menor frecuencia
   int const maxFreq = std::max({ freqs.redCount, freqs.greenCount, freqs.blueCount });
   int const minFreq = std::min({ freqs.redCount, freqs.greenCount, freqs.blueCount });
 
-  auto red = std::get<std::vector<uint8_t>>(imagen.redChannel);
-  auto green = std::get<std::vector<uint8_t>>(imagen.greenChannel);
-  auto blue = std::get<std::vector<uint8_t>>(imagen.blueChannel);
+  auto red = imagen.redChannel;
+  auto green = imagen.greenChannel;
+  auto blue = imagen.blueChannel;
 
   // Determinar qué canal es el de origen y cuál es el de destino
-  const std::vector<uint8_t>* sourceChannel = nullptr;
-  std::vector<unsigned char> *targetChannel = nullptr;
+  std::vector<PixelType> sourceChannel;
+  std::vector<PixelType> targetChannel;
 
-  if (freqs.redCount == maxFreq) { sourceChannel = &red;
-  } else if (freqs.greenCount == maxFreq) { sourceChannel = &green;
-  } else { sourceChannel = &blue; }
+  if (freqs.redCount == maxFreq) { sourceChannel = red;
+  } else if (freqs.greenCount == maxFreq) { sourceChannel = green;
+  } else { sourceChannel = blue; }
 
-  if (freqs.redCount == minFreq) { targetChannel = &red;
-  } else if (freqs.greenCount == minFreq) { targetChannel = &green;
-  } else { targetChannel = &blue; }
+  if (freqs.redCount == minFreq) { targetChannel = red;
+  } else if (freqs.greenCount == minFreq) { targetChannel = green;
+  } else { targetChannel = blue; }
   size_t const pixelCount = static_cast<size_t>(metadata.width) * static_cast<size_t>(metadata.height); // Multiplicación segura
   // Reemplazar los valores del canal menos frecuente con los del canal más frecuente
   for (size_t i = 0; i < pixelCount; ++i) { // Usamos size_t
-    (*targetChannel)[i] = (*sourceChannel)[i];
+    targetChannel[i] = sourceChannel[i];
   }
     saveImageSOAToPPM(imagen, metadata, outputPath);
 }
@@ -77,7 +79,9 @@ void writeData16Bit(std::ofstream& outFile, const ColorChannels16Bit& channels, 
         outFile.put(static_cast<char>(channels.blue[i] & HEX_VAL));        // Byte bajo
     }
 }
-void saveImageSOAToPPM(const ImageSOA& image, const PPMMetadata& metadata, const std::string& outputPath) {
+
+template <typename PixelType>
+void saveImageSOAToPPM(const ImageSOA<PixelType> & image, const PPMMetadata& metadata, const std::string& outputPath) {
     std::ofstream outFile(outputPath, std::ios::binary);
     if (!outFile) {
         std::cerr << "Error al abrir el archivo para escritura: " << outputPath << '\n';
@@ -88,25 +92,21 @@ void saveImageSOAToPPM(const ImageSOA& image, const PPMMetadata& metadata, const
 
     size_t const pixelCount = static_cast<size_t>(metadata.width) * metadata.height;
 
-    if (std::holds_alternative<std::vector<uint8_t>>(image.redChannel) &&
-        std::holds_alternative<std::vector<uint8_t>>(image.greenChannel) &&
-        std::holds_alternative<std::vector<uint8_t>>(image.blueChannel)) {
-
+    if constexpr (std::is_same_v<PixelType, uint8_t>) {
+        // Use 8-bit channels directly
         ColorChannels8Bit const channels {
-            .red=std::get<std::vector<uint8_t>>(image.redChannel),
-            .green=std::get<std::vector<uint8_t>>(image.greenChannel),
-            .blue=std::get<std::vector<uint8_t>>(image.blueChannel)
+            .red = image.redChannel,
+            .green = image.greenChannel,
+            .blue = image.blueChannel
         };
         writeData8Bit(outFile, channels, pixelCount);
 
-    } else if (std::holds_alternative<std::vector<uint16_t>>(image.redChannel) &&
-               std::holds_alternative<std::vector<uint16_t>>(image.greenChannel) &&
-               std::holds_alternative<std::vector<uint16_t>>(image.blueChannel)) {
-
+    } else if constexpr (std::is_same_v<PixelType, uint16_t>) {
+        // Convert 16-bit channels to 8-bit
         ColorChannels16Bit const channels {
-            .red=std::get<std::vector<uint16_t>>(image.redChannel),
-            .green=std::get<std::vector<uint16_t>>(image.greenChannel),
-            .blue=std::get<std::vector<uint16_t>>(image.blueChannel)
+            .red = image.redChannel,
+            .green = image.greenChannel,
+            .blue = image.blueChannel
         };
         writeData16Bit(outFile, channels, pixelCount);
 
@@ -118,3 +118,11 @@ void saveImageSOAToPPM(const ImageSOA& image, const PPMMetadata& metadata, const
     outFile.close();
     std::cout << "Imagen guardada en: " << outputPath << '\n';
 }
+
+// Explicit instantiation
+template ColorFrequencies contarFrecuencias<uint8_t>(const ImageSOA<uint8_t>&, int, int);
+template ColorFrequencies contarFrecuencias<uint16_t>(const ImageSOA<uint16_t>&, int, int);
+template void cutfreqSOA<uint8_t>(const ImageSOA<uint8_t>&, const PPMMetadata&, const std::string&, const ColorFrequencies&);
+template void cutfreqSOA<uint16_t>(const ImageSOA<uint16_t>&, const PPMMetadata&, const std::string&, const ColorFrequencies&);
+template void saveImageSOAToPPM<uint8_t>(const ImageSOA<uint8_t>&, const PPMMetadata&, const std::string&);
+template void saveImageSOAToPPM<uint16_t>(const ImageSOA<uint16_t>&, const PPMMetadata&, const std::string&);

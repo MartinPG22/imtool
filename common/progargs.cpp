@@ -9,6 +9,7 @@
 bool isInteger(const std::string& integer) {
     return std::regex_match(integer, std::regex("-?[0-9]+"));
 }
+
 int executeInfo(const std::vector<std::string>& arguments, const PPMMetadata& metadata) {
     const std::string& inputPath = arguments[0];
     const std::string& outputPath = arguments[1];
@@ -39,11 +40,12 @@ int executeMaxlevel(const std::vector<std::string>& arguments, PPMMetadata& meta
     const std::string& outputPath = arguments[1];
     const std::string& operation = arguments[2];
     std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
-    if (method == "soa") {
-        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+
+    /*if (method == "soa") {
+        ImageSOA const imagensrcSOA = cargarImagenPPMSOA<PixelType>(inputPath, metadata);
     } else if (method == "aos") {
         ImageAOS const imagensrcAOS = cargarImagenPPMAOS(inputPath, metadata);
-    }
+    }*/
 
     if (arguments.size() != 4) {
         std::cerr << "Error: Invalid number of extra arguments for maxlevel: " << arguments.size() - 3 << '\n';
@@ -64,8 +66,14 @@ int executeMaxlevel(const std::vector<std::string>& arguments, PPMMetadata& meta
         ImageAOS const imagensrcAOS = cargarImagenPPMAOS(inputPath, metadata);
         res = maxlevelAOS(imagensrcAOS, metadata, std::stoi(arguments[3]), outputPath);
     } else if (method == "soa") {
-        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
-        res = maxlevelSOA(imagensrcSOA, metadata, std::stoi(arguments[3]), outputPath);
+        // Comprobar si es uint8_t o uint16_t
+        if ((METATADATA_MAX_VALUE <= metadata.max_value) && (metadata.max_value <= MAX_16)) {
+            auto const imagensrcSOA = cargarImagenPPMSOA<uint16_t>(inputPath, metadata);
+            res = maxlevelSOA(imagensrcSOA, metadata, std::stoi(arguments[3]), outputPath);
+        } else {
+            auto const imagensrcSOA = cargarImagenPPMSOA<uint8_t>(inputPath, metadata);
+            res = maxlevelSOA(imagensrcSOA, metadata, std::stoi(arguments[3]), outputPath);
+        }
     }
     return res;
 }
@@ -121,13 +129,18 @@ int executeResize(const std::vector<std::string>& arguments, PPMMetadata& metada
         ImageAOS const imagensrcAOS = cargarImagenPPMAOS(inputPath, metadata);
         ImageAOS const resizedImage = resize(imagensrcAOS, metadata, newSize, outputPath);
     } else if (method == "soa") {
-        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        if ((METATADATA_MAX_VALUE <= metadata.max_value) && (metadata.max_value <= MAX_16)) {
+            const ImageSOA imagensrcSOA = cargarImagenPPMSOA<uint16_t>(inputPath, metadata);
+        } else {
+            const ImageSOA imagensrcSOA = cargarImagenPPMSOA<uint8_t>(inputPath, metadata);
+        }
         //imprimirImagenSOA(imagensrcSOA, metadata);
         //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
     }
     std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
     return 0;
 }
+
 int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method) {
     const std::string& inputPath = arguments[0];
     const std::string& outputPath = arguments[1];
@@ -150,18 +163,25 @@ int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metad
         ImageAOS imagensrcAOS = cargarImagenPPMAOS(inputPath, metadata);
         cutfreq(imagensrcAOS,metadata,numberOfColors, outputPath);
     } else if (method == "soa") {
-        const ImageSOA imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
-
-        // Contar frecuencias de cada canal
-        ColorFrequencies const freqs = contarFrecuencias(imagensrcSOA, static_cast<int>(metadata.width), static_cast<int>(metadata.height));
-        // Reemplazar colores
-        cutfreqSOA(imagensrcSOA,metadata, outputPath, freqs);
-
+        if ((METATADATA_MAX_VALUE <= metadata.max_value) && (metadata.max_value <= MAX_16)) {
+            const ImageSOA imagensrcSOA = cargarImagenPPMSOA<uint16_t>(inputPath, metadata);
+            // Contar frecuencias de cada canal
+            ColorFrequencies const freqs = contarFrecuencias(imagensrcSOA, static_cast<int>(metadata.width), static_cast<int>(metadata.height));
+            // Reemplazar colores
+            cutfreqSOA(imagensrcSOA,metadata, outputPath, freqs);
+        } else {
+            const ImageSOA imagensrcSOA = cargarImagenPPMSOA<uint8_t>(inputPath, metadata);
+            // Contar frecuencias de cada canal
+            ColorFrequencies const freqs = contarFrecuencias(imagensrcSOA, static_cast<int>(metadata.width), static_cast<int>(metadata.height));
+            // Reemplazar colores
+            cutfreqSOA(imagensrcSOA,metadata, outputPath, freqs);
+        }
     }
     std::cout << "Executing 'cutfreq' operation with number of colors: " << numberOfColors << " on: " << inputPath << '\n';
     std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
     return 0;
 }
+
 int executeCompress(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method){
     const std::string& inputPath = arguments[0];
     const std::string& outputPath = arguments[1];
@@ -179,7 +199,11 @@ int executeCompress(const std::vector<std::string>& arguments, PPMMetadata& meta
         ImageAOS const imagensrcAOS = cargarImagenPPMAOS(inputPath, metadata);
         writeCPPM(imagensrcAOS, outputPath,metadata);
     } else if (method == "soa") {
-        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        if ((METATADATA_MAX_VALUE <= metadata.max_value) && (metadata.max_value <= MAX_16)) {
+            auto const imagensrcSOA = cargarImagenPPMSOA<uint16_t>(inputPath, metadata);
+        } else {
+            auto const imagensrcSOA = cargarImagenPPMSOA<uint8_t>(inputPath, metadata);
+        }
         //imprimirImagenSOA(imagensrcSOA, metadata);
         //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
     }
@@ -203,10 +227,14 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
 
     std::cout << "(Depuracion) Llego aqui " << inputPath << '\n';
     if (operation == "info") { executeInfo(arguments, metadata);
-    } else if (operation == "maxlevel") {executeMaxlevel(arguments, metadata, method);
-    } else if (operation == "resize") {executeResize(arguments, metadata, method);
-    } else if (operation == "cutfreq") {executeCutfreq(arguments, metadata, method);
-    } else if (operation == "compress") {executeCompress(arguments, metadata, method);
+    } else if (operation == "maxlevel") {
+        executeMaxlevel(arguments, metadata, method);
+    } else if (operation == "resize") {
+        executeResize(arguments, metadata, method);
+    } else if (operation == "cutfreq") {
+        executeCutfreq(arguments, metadata, method);
+    } else if (operation == "compress") {
+        executeCompress(arguments, metadata, method);
     } else {
         std::cerr << "Error: Invalid option: " << operation << '\n';
     }

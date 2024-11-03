@@ -5,7 +5,8 @@
 #include "compress.hpp"
 
 
-void writeCPPMSOA(const ImageSOA& image, const std::string& filename, const PPMMetadata& metadata) {
+template <typename PixelType>
+void writeCPPMSOA(const ImageSOA<PixelType> & image, const std::string& filename, const PPMMetadata& metadata) {
     // Abrir archivo en modo binario
     std::ofstream file(filename, std::ios::binary);
     if (!file) {

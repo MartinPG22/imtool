@@ -19,14 +19,19 @@ constexpr int METATADATA_MAX_VALUE = 255;
 constexpr int BYTE_SIZE = 8;
 
 // Estructura que representa la imagen en formato SOA (Structure of Arrays)
+// PixelType es el tipo de dato de los píxeles (uint8_t o uint16_t)
+template <typename PixelType>
 struct ImageSOA {
-  std::variant<std::vector<uint8_t>, std::vector<uint16_t>> redChannel; // Vector de píxeles (estructura SOA)
-  std::variant<std::vector<uint8_t>, std::vector<uint16_t>> greenChannel; // Vector de píxeles (estructura SOA)
-  std::variant<std::vector<uint8_t>, std::vector<uint16_t>> blueChannel; // Vector de píxeles (estructura SOA)
+    std::vector<PixelType> redChannel; // Vector de píxeles (estructura SOA)
+    std::vector<PixelType> greenChannel; // Vector de píxeles (estructura SOA)
+    std::vector<PixelType> blueChannel; // Vector de píxeles (estructura SOA)
 };
 
-ImageSOA cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& metadata);
-int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, int maxLevel, const std::string& outputPath);
-void imprimirImagenSOA(const ImageSOA& imagen, const PPMMetadata& metadata);
+template <typename PixelType>
+ImageSOA<PixelType> cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& metadata);
+template <typename PixelType>
+int saveSOAtoPPM(const ImageSOA<PixelType>& srcImage, const PPMMetadata& metadata, int maxLevel, const std::string& outputPath);
+template <typename PixelType>
+void imprimirImagenSOA(const ImageSOA<PixelType>& imagen, const PPMMetadata& metadata);
 
 #endif //IMAGESOA_HPP

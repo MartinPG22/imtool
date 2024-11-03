@@ -14,10 +14,11 @@ namespace {
      * @param imagen The SOA image to store the channels.
      * @param num_pixels The number of pixels to read.
      */
-    void leerCanales8Bits(std::ifstream& archivo, ImageSOA& imagen, const size_t num_pixels) {
-        auto& red = std::get<std::vector<uint8_t>>(imagen.redChannel);
-        auto& green = std::get<std::vector<uint8_t>>(imagen.greenChannel);
-        auto& blue = std::get<std::vector<uint8_t>>(imagen.blueChannel);
+    template <typename PixelType>
+    void leerCanales8Bits(std::ifstream& archivo, ImageSOA<PixelType>& imagen, const size_t num_pixels) {
+        auto& red = imagen.redChannel;
+        auto& green = imagen.greenChannel;
+        auto& blue = imagen.blueChannel;
 
         std::array<char, 1> buffer{};
         for (size_t i = 0; i < num_pixels; i++) {
@@ -39,10 +40,11 @@ namespace {
      * @param imagen The SOA image to store the channels.
      * @param num_pixels The number of pixels to read.
      */
-    void leerCanales16Bits(std::ifstream& archivo, ImageSOA& imagen, const size_t num_pixels) {
-        auto& red = std::get<std::vector<uint16_t>>(imagen.redChannel);
-        auto& green = std::get<std::vector<uint16_t>>(imagen.greenChannel);
-        auto& blue = std::get<std::vector<uint16_t>>(imagen.blueChannel);
+    template <typename PixelType>
+    void leerCanales16Bits(std::ifstream& archivo, ImageSOA<PixelType>& imagen, const size_t num_pixels) {
+        auto& red = imagen.redChannel;
+        auto& green = imagen.greenChannel;
+        auto& blue = imagen.blueChannel;
 
         std::array<char, 1> buffer{};
         for (size_t i = 0; i < num_pixels; ++i) {
@@ -64,9 +66,15 @@ namespace {
             archivo.read(buffer.data(), 1);
             const auto b_high = static_cast<uint8_t>(buffer[0]);
 
-            red[i] = static_cast<uint16_t>(r_low | (r_high << BYTE_SIZE));
-            green[i] = static_cast<uint16_t>(g_low | (g_high << BYTE_SIZE));
-            blue[i] = static_cast<uint16_t>(b_low | (b_high << BYTE_SIZE));
+            // Combine high and low bytes into a 16-bit value
+            auto r_value = static_cast<uint16_t>(r_low | (r_high << BYTE_SIZE));
+            auto g_value = static_cast<uint16_t>(g_low | (g_high << BYTE_SIZE));
+            auto b_value = static_cast<uint16_t>(b_low | (b_high << BYTE_SIZE));
+
+            // Assign to the vector, with potential narrowing if PixelType is uint8_t
+            red[i] = static_cast<PixelType>(r_value);
+            green[i] = static_cast<PixelType>(g_value);
+            blue[i] = static_cast<PixelType>(b_value);
         }
     }
 }
@@ -81,7 +89,8 @@ namespace {
  * @param metadata Metadata of the image.
  * @return ImageSOA The image in SOA format.
  */
-ImageSOA cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& metadata) {
+template <typename PixelType>
+ImageSOA<PixelType> cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& metadata) {
     std::ifstream archivo(nombre_archivo, std::ios::binary);
     if (!archivo) {
         std::cerr << "Error: No se puede abrir el archivo." << '\n';
@@ -98,19 +107,16 @@ ImageSOA cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& meta
     archivo >> metadata.width >> metadata.height >> metadata.max_value;
     archivo.ignore(); // Ignorar el salto de línea después del encabezado
     // Crear la estructura ImageSOA
-    ImageSOA imagen;
+    ImageSOA<PixelType> imagen;
     size_t const num_pixels = metadata.width * metadata.height;
+    imagen.redChannel = std::vector<PixelType>(num_pixels);
+    imagen.greenChannel = std::vector<PixelType>(num_pixels);
+    imagen.blueChannel = std::vector<PixelType>(num_pixels);
     // Leer los píxeles en función del valor máximo
     if (metadata.max_value <= METATADATA_MAX_VALUE) {
-        imagen.redChannel = std::vector<uint8_t>(num_pixels);
-        imagen.greenChannel = std::vector<uint8_t>(num_pixels);
-        imagen.blueChannel = std::vector<uint8_t>(num_pixels);
         leerCanales8Bits(archivo, imagen, num_pixels);
     } else {
         // Caso: 2 bytes por componente (RGB) en formato little-endian
-        imagen.redChannel = std::vector<uint16_t>(num_pixels);
-        imagen.greenChannel = std::vector<uint16_t>(num_pixels);
-        imagen.blueChannel = std::vector<uint16_t>(num_pixels);
         leerCanales16Bits(archivo, imagen, num_pixels);
     }
     return imagen;
@@ -127,54 +133,28 @@ ImageSOA cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& meta
  * @return int 0 if the image was saved correctly, 1 if there was an error opening the file or
  *             if the pixel format is not supported.
  */
-int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, const int maxLevel, const std::string& outputPath) {
+template <typename PixelType>
+int saveSOAtoPPM(const ImageSOA<PixelType>& srcImage, const PPMMetadata& metadata, const int maxLevel, const std::string& outputPath) {
     std::ofstream outFile(outputPath, std::ios::binary);
     if (!outFile.is_open()) {
         std::cerr << "No se pudo abrir el archivo de salida" << '\n';
         return 1;
     }
-    // Check channel sizes
-    if (std::holds_alternative<std::vector<uint8_t>>(srcImage.redChannel) &&
-        std::holds_alternative<std::vector<uint8_t>>(srcImage.greenChannel) &&
-        std::holds_alternative<std::vector<uint8_t>>(srcImage.blueChannel)) {
-        auto redChannel = std::get<std::vector<uint8_t>>(srcImage.redChannel);
-        auto greenChannel = std::get<std::vector<uint8_t>>(srcImage.greenChannel);
-        auto blueChannel = std::get<std::vector<uint8_t>>(srcImage.blueChannel);
-        // Verificar que los canales tengan el mismo tamaño
-        if (redChannel.size() != greenChannel.size() || greenChannel.size() != blueChannel.size()) {
-            std::cerr << "Channel sizes do not match!" << '\n';
-            return 1;
-        }
-        // Escribir el encabezado
-        outFile << "P6\n" << metadata.width << " " << metadata.height << "\n" << maxLevel << "\n";
-        // Escribir los valores de los píxeles en el formato binario
-        for (size_t i = 0; i < redChannel.size(); ++i) {
-            outFile.put(static_cast<char>(redChannel[i]));
-            outFile.put(static_cast<char>(greenChannel[i]));
-            outFile.put(static_cast<char>(blueChannel[i]));
-        }
-    } else if (std::holds_alternative<std::vector<uint16_t>>(srcImage.redChannel) &&
-           std::holds_alternative<std::vector<uint16_t>>(srcImage.greenChannel) &&
-           std::holds_alternative<std::vector<uint16_t>>(srcImage.blueChannel)) {
-        auto redChannel = std::get<std::vector<uint16_t>>(srcImage.redChannel);
-        auto greenChannel = std::get<std::vector<uint16_t>>(srcImage.greenChannel);
-        auto blueChannel = std::get<std::vector<uint16_t>>(srcImage.blueChannel);
-        // Verificar que los canales tengan el mismo tamaño
-        if (redChannel.size() != greenChannel.size() || greenChannel.size() != blueChannel.size()) {
-            std::cerr << "Channel sizes do not match!" << '\n';
-            return 1;
-        }
-        // Escribir el encabezado
-        outFile << "P6\n" << metadata.width << " " << metadata.height << "\n" << maxLevel << "\n";
-        // Escribir los valores de los píxeles en el formato binario
-        for (size_t i = 0; i < redChannel.size(); ++i) {
-            outFile.put(static_cast<char>(redChannel[i] * maxLevel / MAX_16));
-            outFile.put(static_cast<char>(greenChannel[i] * maxLevel / MAX_16));
-            outFile.put(static_cast<char>(blueChannel[i] * maxLevel / MAX_16));
-        }
-    } else {
-        std::cerr << "Unsupported pixel format!" << '\n';
+    auto redChannel = srcImage.redChannel;
+    auto greenChannel = srcImage.greenChannel;
+    auto blueChannel = srcImage.blueChannel;
+    // Verificar que los canales tengan el mismo tamaño
+    if (redChannel.size() != greenChannel.size() || greenChannel.size() != blueChannel.size()) {
+        std::cerr << "Channel sizes do not match!" << '\n';
         return 1;
+    }
+    // Escribir el encabezado
+    outFile << "P6\n" << metadata.width << " " << metadata.height << "\n" << maxLevel << "\n";
+    // Escribir los valores de los píxeles en el formato binario
+    for (size_t i = 0; i < redChannel.size(); ++i) {
+        outFile.put(static_cast<char>(redChannel[i]));
+        outFile.put(static_cast<char>(greenChannel[i]));
+        outFile.put(static_cast<char>(blueChannel[i]));
     }
     outFile.close();
     std::cout << "La imagen con el nuevo nivel máximo de intensidad se ha guardado en " << outputPath << '\n';
@@ -189,7 +169,8 @@ int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, const in
  * @param imagen The SOA image to print.
  * @param metadata Metadata of the image.
  */
-void imprimirImagenSOA(const ImageSOA& imagen, const PPMMetadata& metadata) {
+template <typename PixelType>
+void imprimirImagenSOA(const ImageSOA<PixelType>& imagen, const PPMMetadata& metadata) {
     // Obtener el número total de píxeles
     size_t const num_pixels = metadata.width * metadata.height;
 
@@ -202,21 +183,17 @@ void imprimirImagenSOA(const ImageSOA& imagen, const PPMMetadata& metadata) {
         std::cout << '\n';
     };
     // Imprimir canal rojo
-    if (std::holds_alternative<std::vector<uint8_t>>(imagen.redChannel)) {
-        imprimirCanal(std::get<std::vector<uint8_t>>(imagen.redChannel), "Red");
-    } else {
-        imprimirCanal(std::get<std::vector<uint16_t>>(imagen.redChannel), "Red");
-    }
+    imprimirCanal(std::vector<PixelType>(imagen.redChannel), "Red");
     // Imprimir canal verde
-    if (std::holds_alternative<std::vector<uint8_t>>(imagen.greenChannel)) {
-        imprimirCanal(std::get<std::vector<uint8_t>>(imagen.greenChannel), "Green");
-    } else {
-        imprimirCanal(std::get<std::vector<uint16_t>>(imagen.greenChannel), "Green");
-    }
+    imprimirCanal(std::vector<PixelType>(imagen.greenChannel), "Green");
     // Imprimir canal azul
-    if (std::holds_alternative<std::vector<uint8_t>>(imagen.blueChannel)) {
-        imprimirCanal(std::get<std::vector<uint8_t>>(imagen.blueChannel), "Blue");
-    } else {
-        imprimirCanal(std::get<std::vector<uint16_t>>(imagen.blueChannel), "Blue");
-    }
+    imprimirCanal(std::vector<PixelType>(imagen.blueChannel), "Blue");
 }
+
+// Explicit instantiation
+template ImageSOA<uint8_t> cargarImagenPPMSOA(const std::string&, PPMMetadata&);
+template ImageSOA<uint16_t> cargarImagenPPMSOA(const std::string&, PPMMetadata&);
+template int saveSOAtoPPM(const ImageSOA<uint8_t>&, const PPMMetadata&, const int, const std::string&);
+template int saveSOAtoPPM(const ImageSOA<uint16_t>&, const PPMMetadata&, const int, const std::string&);
+template void imprimirImagenSOA(const ImageSOA<uint8_t>&, const PPMMetadata&);
+template void imprimirImagenSOA(const ImageSOA<uint16_t>&, const PPMMetadata&);

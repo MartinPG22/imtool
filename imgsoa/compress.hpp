@@ -25,6 +25,8 @@ struct TupleHash {
     }, tuple);
   }
 };
-void writeCPPMSOA(const ImageSOA& image, const std::string& filename, const PPMMetadata& metadata);
+
+template <typename PixelType>
+void writeCPPMSOA(const ImageSOA<PixelType>& image, const std::string& filename, const PPMMetadata& metadata);
 
 #endif //COMPRESS_SOA_HPP

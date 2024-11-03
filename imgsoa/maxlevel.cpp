@@ -18,27 +18,34 @@
  *             si el formato de píxeles no es compatible.
  * @throws std::runtime_error Si no se puede abrir el archivo de salida o si el formato de píxeles no es compatible.
  */
-int maxlevelSOA(const ImageSOA& srcImage, const PPMMetadata& metadata, const int newMaxLevel, const std::string& outputPath) {
-    // Verificar que los canales tengan el mismo tamaño
-    const auto& red = std::get<std::vector<uint8_t>>(srcImage.redChannel);
-    const auto& green = std::get<std::vector<uint8_t>>(srcImage.greenChannel);
-    const auto& blue = std::get<std::vector<uint8_t>>(srcImage.blueChannel);
-    if (red.size() != green.size() || red.size() != blue.size()) {
-        std::cerr << "Error: Los canales de color no tienen el mismo tamaño\n";
+template <typename PixelType>
+int maxlevelSOA(const ImageSOA<PixelType>& srcImage, const PPMMetadata& metadata, const int newMaxLevel, const std::string& outputPath) {
+    // Check that the channels have the same size
+    if (srcImage.redChannel.size() != srcImage.greenChannel.size() || 
+        srcImage.redChannel.size() != srcImage.blueChannel.size()) {
+        std::cerr << "Error: Color channels do not have the same size\n";
         return 1;
     }
     std::cout << "Cambiando el nivel máximo de intensidad de la imagen a " << newMaxLevel << '\n';
-    // Convertir los valores de los píxeles
-    std::vector<uint8_t> outRed(red.size());
-    std::vector<uint8_t> outGreen(green.size());
-    std::vector<uint8_t> outBlue(blue.size());
-    for (size_t i = 0; i < red.size(); ++i) {
-        outRed[i] = static_cast<uint8_t>(red[i] * newMaxLevel / metadata.max_value);
-        outGreen[i] = static_cast<uint8_t>(green[i] * newMaxLevel / metadata.max_value);
-        outBlue[i] = static_cast<uint8_t>(blue[i] * newMaxLevel / metadata.max_value);
+    // Create output channels
+    std::vector<PixelType> outRed(srcImage.redChannel.size());
+    std::vector<PixelType> outGreen(srcImage.greenChannel.size());
+    std::vector<PixelType> outBlue(srcImage.blueChannel.size());
+    // Convert pixel values
+    for (size_t i = 0; i < srcImage.redChannel.size(); ++i) {
+        outRed[i] = static_cast<PixelType>(srcImage.redChannel[i] * newMaxLevel / metadata.max_value);
+        outGreen[i] = static_cast<PixelType>(srcImage.greenChannel[i] * newMaxLevel / metadata.max_value);
+        outBlue[i] = static_cast<PixelType>(srcImage.blueChannel[i] * newMaxLevel / metadata.max_value);
     }
     // Guardar la imagen
-    const ImageSOA max_level_SOA = { .redChannel=outRed, .greenChannel=outGreen, .blueChannel=outBlue };
-    const PPMMetadata new_metadata = { .width=metadata.width, .height=metadata.height, .max_value=newMaxLevel };
+    const ImageSOA<PixelType> max_level_SOA = { .redChannel=outRed, .greenChannel=outGreen, .blueChannel=outBlue };
+    const PPMMetadata new_metadata = {.width=metadata.width, .height=metadata.height, .max_value=newMaxLevel};
     return saveSOAtoPPM(max_level_SOA, new_metadata, newMaxLevel, outputPath);
+    //const ImageSOA max_level_SOA = { .redChannel=outRed, .greenChannel=outGreen, .blueChannel=outBlue };
+    //const PPMMetadata new_metadata = { .width=metadata.width, .height=metadata.height, .max_value=newMaxLevel };
+    //return saveSOAtoPPM(max_level_SOA, new_metadata, newMaxLevel, outputPath);
 }
+
+// Explicit instantiation
+template int maxlevelSOA<uint8_t>(const ImageSOA<uint8_t>&, const PPMMetadata&, const int, const std::string&);
+template int maxlevelSOA<uint16_t>(const ImageSOA<uint16_t>&, const PPMMetadata&, const int, const std::string&);
