@@ -60,8 +60,8 @@ std::vector<T> resizePixels(const std::vector<T>& srcPixels, const PPMMetadata& 
 
 
 // Declaraciones de las nuevas funciones
-void savePixelsToPPM8(const std::string& outputPath, const std::vector<Pixel8>& pixels, const std::vector<size_t>& newSize, size_t intensidad);
-void savePixelsToPPM16(const std::string& outputPath, const std::vector<Pixel16>& pixels, const std::vector<size_t>& newSize, size_t intensidad);
+//void savePixelsToPPM8(const std::string& outputPath, const std::vector<Pixel8>& pixels, const std::vector<size_t>& newSize, size_t intensidad);
+//void savePixelsToPPM16(const std::string& outputPath, const std::vector<Pixel16>& pixels, const std::vector<size_t>& newSize, size_t intensidad);
 
 // Declaración de la función
 ImageAOS resize(const ImageAOS& srcImage, const PPMMetadata& metadata, const std::vector<size_t>& newSize, const std::string& OutputPath);

@@ -29,7 +29,7 @@ Pixel16 interpolatePixel(const Pixel16& p00, const Pixel16& p01, float ttt) {
     return result;
 }
 
-    // Función para guardar una imagen PPM de 8 bits
+/*// Función para guardar una imagen PPM de 8 bits
 void savePixelsToPPM8(const std::string& outputPath, const std::vector<Pixel8>& pixels, const std::vector<size_t>& newSize, size_t intensidad ) {
     size_t const newWidth = newSize[0];
     size_t const newHeight = newSize[1];
@@ -66,14 +66,13 @@ void savePixelsToPPM16(const std::string& outputPath, const std::vector<Pixel16>
         outFile.put(static_cast<char>(pixel.b & MAX_PIXEL_VALUE)); // Escribir el byte bajo
     }
     outFile.close();
-}
+}*/
 
 // Función principal para redimensionar la imagen
 ImageAOS resize(const ImageAOS& srcImage, const PPMMetadata& metadata, const std::vector<size_t>& newSize, const std::string& outputPath) {
     ImageAOS dstImage;
     size_t const newWidth = newSize[0];
     size_t const newHeight = newSize[1];
-    auto const intensidad = static_cast<size_t>(metadata.max_value);
     if (std::holds_alternative<std::vector<Pixel8>>(srcImage.pixels)) {
         const auto& srcPixels = std::get<std::vector<Pixel8>>(srcImage.pixels);
         dstImage.pixels = resizePixels(srcPixels, metadata, newWidth, newHeight);
@@ -86,10 +85,9 @@ ImageAOS resize(const ImageAOS& srcImage, const PPMMetadata& metadata, const std
     PPMMetadata newMetadata{};
     newMetadata.width = newWidth;
     newMetadata.height = newHeight;
-    ;
 
-    saveAOStoPPM(dstImage, newMetadata, static_cast<int>(intensidad), outputPath);
-    std::cout << "La imagen con el nuevo nivel máximo de intensidad se ha guardado en " << outputPath << '\n';
+    saveAOStoPPM(dstImage, newMetadata, metadata.max_value, outputPath);
+    std::cout << "La imagen con el nuevo tamaño se ha guardado en " << outputPath << '\n';
     return dstImage;
 }
 

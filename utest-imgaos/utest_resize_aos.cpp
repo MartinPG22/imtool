@@ -44,59 +44,6 @@ TEST(PixelInterpolationTest, InterpolatePixel16) {
     EXPECT_EQ(result.b, 32767);
 }
 
-// Test image saving for 8-bit pixels
-TEST(ImageSavingTest, SavePixelsToPPM8) {
-    std::vector<Pixel8> const pixels = {{.r=255, .g=0, .b=0}, {.r=0, .g=255, .b=0}, {.r=0, .g=0, .b=255}};
-    std::vector<size_t> const newSize = {1, 3};
-
-    // Guardar en un archivo temporal
-    const std::string path = "test_output_8.ppm";
-    savePixelsToPPM8(path, pixels, newSize, 255);
-
-    // Verificar contenido del archivo
-    std::ifstream file(path, std::ios::binary);
-    ASSERT_TRUE(file.is_open());
-
-    std::string header;
-    std::getline(file, header); // Leer el encabezado PPM
-    EXPECT_EQ(header, "P6");
-
-    size_t width = 0;
-    size_t height = 0;
-    size_t max_value = 0;
-    file >> width >> height >> max_value; // Leer dimensiones y valor máximo
-    file.ignore(); // Ignorar el salto de línea después del valor máximo
-    EXPECT_EQ(width, 1);
-    EXPECT_EQ(height, 3);
-    EXPECT_EQ(max_value, 255);
-
-    // Leer los valores de los píxeles
-    std::vector<Pixel8> readPixels(height);
-    for (size_t i = 0; i < height; ++i) {
-        std::array<char, 3> pixelData{}; // Usar std::array en lugar de un arreglo C-style
-        file.read(pixelData.data(), pixelData.size()); // Leer los bytes directamente
-
-        // Comprobar si la lectura fue exitosa
-        ASSERT_EQ(file.gcount(), static_cast<std::streamsize>(pixelData.size())); // Asegúrate de que se leyeron 3 bytes
-
-        readPixels[i].r = static_cast<uint8_t>(pixelData[0]);
-        readPixels[i].g = static_cast<uint8_t>(pixelData[1]);
-        readPixels[i].b = static_cast<uint8_t>(pixelData[2]);
-    }
-
-    file.close();
-
-    // Limpiar
-    if (std::remove(path.c_str()) != 0) { // Verificar si la eliminación fue exitosa
-        std::cerr << "Error al eliminar el archivo: " << path << '\n';
-    }
-
-    // Comprobar los valores de los píxeles
-    EXPECT_EQ(readPixels[0].r, 255);
-    EXPECT_EQ(readPixels[1].g, 255);
-    EXPECT_EQ(readPixels[2].b, 255);
-}
-
 // Add more tests for other functions as necessary...
 
 int main(int argc, char **argv) {

@@ -20,7 +20,6 @@
 
 
 void cutfreq(ImageAOS& srcImage, const PPMMetadata& metadata, int nColores, const std::string& outputPath);
-void saveToPPM(const ImageAOS& srcImage, const PPMMetadata& metadata, const std::string& outputPath);
 template <typename T>
 constexpr Color<T> extractRGB(int rgb);
 template <typename T>
