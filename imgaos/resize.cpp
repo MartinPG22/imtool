@@ -77,13 +77,18 @@ ImageAOS resize(const ImageAOS& srcImage, const PPMMetadata& metadata, const std
     if (std::holds_alternative<std::vector<Pixel8>>(srcImage.pixels)) {
         const auto& srcPixels = std::get<std::vector<Pixel8>>(srcImage.pixels);
         dstImage.pixels = resizePixels(srcPixels, metadata, newWidth, newHeight);
-        savePixelsToPPM8(outputPath, std::get<std::vector<Pixel8>>(dstImage.pixels), newSize, intensidad);
+
     } else if (std::holds_alternative<std::vector<Pixel16>>(srcImage.pixels)) {
         const auto& srcPixels = std::get<std::vector<Pixel16>>(srcImage.pixels);
         dstImage.pixels = resizePixels(srcPixels, metadata, newWidth, newHeight);
-        savePixelsToPPM16(outputPath, std::get<std::vector<Pixel16>>(dstImage.pixels), newSize, intensidad);
     }
+    // Tengo que crear un nuevo metadata con las nuevas dimensiones
+    PPMMetadata newMetadata{};
+    newMetadata.width = newWidth;
+    newMetadata.height = newHeight;
+    ;
 
+    saveAOStoPPM(dstImage, newMetadata, static_cast<int>(intensidad), outputPath);
     std::cout << "La imagen con el nuevo nivel máximo de intensidad se ha guardado en " << outputPath << '\n';
     return dstImage;
 }
