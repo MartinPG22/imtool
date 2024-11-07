@@ -3,7 +3,6 @@
 //
 
 #include "./imgaos/resize.hpp"
-#include "./imgaos/resize.cpp"
 #include <gtest/gtest.h>
 #include <vector>
 #include <string>
@@ -26,9 +25,9 @@ TEST(InterpolationTest, Interpolate16) {
 
 // Test pixel interpolation for 8-bit
 TEST(PixelInterpolationTest, InterpolatePixel8) {
-    Pixel8 const p1{.r=0, .g=128, .b=255};
-    Pixel8 const p2{.r=255, .g=128, .b=0};
-    Pixel8 const result = interpolatePixel(p1, p2, 0.5F);
+    Pixel8 constexpr pixel1{.r=0, .g=128, .b=255};
+    Pixel8 const pixel2{.r=255, .g=128, .b=0};
+    Pixel8 const result = interpolatePixel(pixel1, pixel2, 0.5F);
     EXPECT_EQ(result.r, 127);
     EXPECT_EQ(result.g, 128);
     EXPECT_EQ(result.b, 127);
@@ -36,17 +35,12 @@ TEST(PixelInterpolationTest, InterpolatePixel8) {
 
 // Test pixel interpolation for 16-bit
 TEST(PixelInterpolationTest, InterpolatePixel16) {
-    Pixel16 const p1{.r=0, .g=32768, .b=65535};
-    Pixel16 const p2{.r=65535, .g=32768, .b=0};
-    Pixel16 const result = interpolatePixel(p1, p2, 0.5F);
+    Pixel16 const pixel1{.r=0, .g=32768, .b=65535};
+    Pixel16 const pixel2{.r=65535, .g=32768, .b=0};
+    Pixel16 const result = interpolatePixel(pixel1, pixel2, 0.5F);
     EXPECT_EQ(result.r, 32767);
     EXPECT_EQ(result.g, 32768);
     EXPECT_EQ(result.b, 32767);
 }
 
-// Add more tests for other functions as necessary...
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
