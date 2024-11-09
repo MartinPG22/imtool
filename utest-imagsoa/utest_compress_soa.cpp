@@ -5,7 +5,7 @@
 #include "utest_soa.hpp"
 #include "./imgsoa/compress.hpp"
 #include "./imgsoa/compress.cpp"
-#include <filesystem>
+
 TEST(DeterminePixelSizeTest, HandlesPixelSize) {
 
   // Casos con diferentes números de colores
@@ -23,7 +23,7 @@ TEST(WriteBytesTest, WritesBytesCorrectly) {
   ASSERT_TRUE(testFile.is_open()) << "No se pudo abrir el archivo para escribir.";
 
   // Crear un buffer con datos de prueba
-  std::vector<uint8_t> buffer = {65, 66, 67, 68, 69};  // ASCII de 'A', 'B', 'C', 'D', 'E'
+  std::vector<uint8_t> buffer = {n_65, n_66, n_67, n_68, n_69};  // ASCII de 'A', 'B', 'C', 'D', 'E'
 
   // Escribir los bytes en el archivo
   writeBytes(testFile, buffer);
@@ -78,9 +78,9 @@ TEST(WriteColorTableTest, WritesColorTable) {
   ASSERT_TRUE(file.is_open());
 
   // Leemos los primeros 9 bytes (3 colores de 3 bytes)
-  std::array<char, 9> buffer{};  // Usamos std::array en lugar de C-style array
+  std::array<char, n_9> buffer{};  // Usamos std::array en lugar de C-style array
   // Leemos los bytes
-  file.read(buffer.data(), 9);  // No es necesario realizar cast explícito aquí
+  file.read(buffer.data(), n_9);  // No es necesario realizar cast explícito aquí
 
   // Imprimir el contenido del buffer
   std::cout << "Contenido del buffer leído: ";
@@ -118,9 +118,9 @@ TEST(WritePixelDataTest, WritesPixelDataCorrectly) {
 
   // Mapa de colores a índices para simular una tabla de colores
   pixelData.colorTable = {
-    {std::make_tuple(n_255, 0, 0), 0x000000FF},
-    {std::make_tuple(0, n_255, 0), 0x0000FF00},
-    {std::make_tuple(0, 0, n_255), 0x00FF0000}
+    {std::make_tuple(n_255, 0, 0), n_0x000000FF},
+    {std::make_tuple(0, n_255, 0), n_0x0000FF00},
+    {std::make_tuple(0, 0, n_255), n_0x00FF0000}
   };
 
   size_t const pixelSize = 1;  // Usar un tamaño de píxel de 1 byte
