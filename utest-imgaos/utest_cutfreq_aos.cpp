@@ -4,22 +4,23 @@
 
 #include "utest_aos.hpp"
 
+#include "./imgaos/cutfreq.cpp"
 template <typename T>
 bool colorsAreEqual(const Color<T>& color1, const Color<T>& color2) {
     return color1.r() == color2.r() && color1.g() == color2.g() && color1.b() == color2.b();
 }
 // Prueba para un pixel de 8 bits
 TEST(ColorTest, CombineRGB_Pixel8) {
-    Color<uint8_t> color8(255, 128, 64); // Color con valores máximos de 8 bits
-    uint64_t combined = combineRGB(color8);
+    Color<uint8_t> const color8(255, 128, 64); // Color con valores máximos de 8 bits
+    uint64_t const combined = combineRGB(color8);
 
     // Esperado: (255 << 16) | (128 << 8) | 64
-    uint64_t expected = (255 << 16) | (128 << 8) | 64;
+    uint64_t const expected = (255 << 16) | (128 << 8) | 64;
 
     EXPECT_EQ(combined, expected);
 
     // Imprimir resultado
-    std::cout << "Combined RGB (Pixel 8): " << combined << std::endl;
+    std::cout << "Combined RGB (Pixel 8): " << combined << '\n';
 }
 
 TEST(ColorTests, CombineAndExtractRGB) {
@@ -32,7 +33,7 @@ TEST(ColorTests, CombineAndExtractRGB) {
 
 TEST(ImageTests, CountColorFrequency) {
     ImageAOS image;
-    image.pixels = std::vector<Pixel8>{{.r = 128, .g = 64, .b = 32}, {.r = 128, .g = 64, .b = 32}, {.r = 255, .g = 255, .b = 255}};
+    image.pixels = std::vector<Pixel8>{{.r = n_128, .g = n_64, .b = n_32}, {.r = n_128, .g = n_64, .b = n_32}, {.r = n_255, .g = n_255, .b = n_255}};
 
     std::unordered_map<uint64_t, int> colorFrequency;
     countColorFrequency(image, colorFrequency);
@@ -45,7 +46,7 @@ TEST(ImageTests, CountColorFrequency) {
 
 TEST(ImageTests2, CountColorFrequency) {
     ImageAOS image2;
-    image2.pixels = std::vector<Pixel16>{{.r = 3000, .g = 3000, .b = 3000}, {.r = 3000, .g = 3000, .b = 3000}, {.r = 400, .g = 400, .b = 400}};
+    image2.pixels = std::vector<Pixel16>{{.r = n_3000, .g = n_3000, .b = n_3000}, {.r = n_3000, .g = n_3000, .b = n_3000}, {.r = n_400, .g = n_400, .b = n_400}};
 
     std::unordered_map<uint64_t, int> colorFrequency;
     countColorFrequency(image2, colorFrequency);
@@ -68,12 +69,12 @@ TEST(ImageTests2, CountColorFrequency) {
 // Ejemplo de pruebas unitarias
 TEST(ColorTests, SortColorsByFrequency) {
     std::unordered_map<uint64_t, int> colorFrequency;
-    colorFrequency[combineRGB(Color<int>(255, 0, 0))] = 5;
-    colorFrequency[combineRGB(Color<int>(0, 255, 0))] = 3;
-    colorFrequency[combineRGB(Color<int>(0, 0, 255))] = 5; // Mismo que el rojo, ordenará por RGB
+    colorFrequency[combineRGB(Color<int>(n_255, 0, 0))] = n_5;
+    colorFrequency[combineRGB(Color<int>(0, n_255, 0))] = 3;
+    colorFrequency[combineRGB(Color<int>(0, 0, n_255))] = n_5; // Mismo que el rojo, ordenará por RGB
 
     std::vector<std::tuple<int, Color<int>>> colorData;
-    sortColorsByFrequency(colorFrequency, colorData, 255);
+    sortColorsByFrequency(colorFrequency, colorData, n_255);
 
     // Imprimir el resultado para depuración
     std::cout << "Resultados de colorData:" << '\n';
@@ -119,10 +120,10 @@ TEST(ColorTests, FindClosestColor) {
 // Verificación de que la función aplica el reemplazo correctamente
 TEST(ImageTests, ApplyColorReplacement) {
     ImageAOS image;
-    image.pixels = std::vector<Pixel8>{{.r=128, .g=64, .b=32}, {.r=128, .g=64, .b=32}, {.r=255, .g=255, .b=255}};
+    image.pixels = std::vector<Pixel8>{{.r=n_128, .g=n_64, .b=n_32}, {.r=n_128, .g=n_64, .b=n_32}, {.r=n_255, .g=n_255, .b=n_255}};
 
     std::unordered_map<u_int64_t, Color<int>> replacementMap;
-    replacementMap[combineRGB(Color<int>(128, 64, 32))] = Color<int>(0, 0, 0); // Reemplazar color (128, 64, 32) con (0, 0, 0)
+    replacementMap[combineRGB(Color<int>(n_128, n_64, n_32))] = Color<int>(0, 0, 0); // Reemplazar color (128, 64, 32) con (0, 0, 0)
 
     applyColorReplacement(image, replacementMap);
 
@@ -142,10 +143,10 @@ TEST(ImageTests, ApplyColorReplacement) {
 // Prueba de reemplazo de color en imagen con píxeles de tipo Pixel16
 TEST(ImageTests, ApplyColorReplacementPixel16) {
     ImageAOS image;
-    image.pixels = std::vector<Pixel16>{{.r=30000, .g=15000, .b=7500}, {.r=30000, .g=15000, .b=7500}, {.r=65535, .g=65535, .b=65535}};
+    image.pixels = std::vector<Pixel16>{{.r=n_30000, .g=n_15000, .b=n_7500}, {.r=n_30000, .g=n_15000, .b=n_7500}, {.r=n_65535, .g=n_65535, .b=n_65535}};
 
     std::unordered_map<uint64_t, Color<int>> replacementMap;
-    Color<int> colorToReplace(30000, 15000, 7500);
+    Color<int> const colorToReplace(n_30000, n_15000, n_7500);
     replacementMap[combineRGB48(colorToReplace)] = Color<int>(0, 0, 0); // Usar combineRGB48
 
     applyColorReplacement(image, replacementMap);
@@ -167,10 +168,10 @@ TEST(ImageTests, ApplyColorReplacementPixel16) {
 // Prueba principal para la función cutfreq
 TEST(MainFunctionTests, CutFreq) {
     ImageAOS image;
-    image.pixels = std::vector<Pixel8>{{.r=128, .g=64, .b=32}, {.r=255, .g=255, .b=255}, {.r=128, .g=64, .b=32}};
+    image.pixels = std::vector<Pixel8>{{.r=n_128, .g=n_64, .b=n_32}, {.r=n_255, .g=n_255, .b=n_255}, {.r=n_128, .g=n_64, .b=n_32}};
 
     PPMMetadata metadata{};
-    metadata.max_value = 255; // Establece el valor máximo de color de la imagen
+    metadata.max_value = n_255; // Establece el valor máximo de color de la imagen
     int constexpr nColores = 1; // Se eliminará el color menos frecuente
     std::string const outputPath = "output.ppm";
 
@@ -194,10 +195,10 @@ TEST(MainFunctionTests, CutFreq) {
 // Prueba principal para la función cutfreq con píxeles de tipo Pixel16
 TEST(MainFunctionTests, CutFreqPixel16) {
     ImageAOS image;
-    image.pixels = std::vector<Pixel16>{{.r=30000, .g=15000, .b=7500}, {.r=65534, .g=65535, .b=65535}, {.r=30000, .g=15000, .b=7500}};
+    image.pixels = std::vector<Pixel16>{{.r=n_30000, .g=n_15000, .b=n_7500}, {.r=n_65534, .g=n_65535, .b=n_65535}, {.r=n_30000, .g=n_15000, .b=n_7500}};
 
     PPMMetadata metadata{};
-    metadata.max_value = 65535; // Establece el valor máximo de color para Pixel16
+    metadata.max_value = n_65535; // Establece el valor máximo de color para Pixel16
     int const nColores = 1; // Se eliminará el color menos frecuente
     std::string const outputPath = "output.ppm";
 
@@ -221,10 +222,10 @@ TEST(MainFunctionTests, CutFreqPixel16) {
 // Otra prueba principal para la función cutfreq
 TEST(MainFunctionTests2, CutFreq) {
     ImageAOS image;
-    image.pixels = std::vector<Pixel16>{{.r=128, .g=64, .b=32}, {.r=300, .g=255, .b=255}, {.r=128, .g=64, .b=32}};
+    image.pixels = std::vector<Pixel16>{{.r=n_128, .g=n_64, .b=n_32}, {.r=n_300, .g=n_255, .b=n_255}, {.r=n_128, .g=n_64, .b=n_32}};
 
     PPMMetadata metadata{};
-    metadata.max_value = 300; // Establece el valor máximo de color de la imagen
+    metadata.max_value = n_300; // Establece el valor máximo de color de la imagen
     int constexpr nColores = 1; // Se eliminará el color menos frecuente
     std::string const outputPath = "output.ppm";
 

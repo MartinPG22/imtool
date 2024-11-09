@@ -4,6 +4,8 @@ add_executable(utest-imgaos
         utest_cutfreq_aos.cpp
         utest_aos.hpp
         utest_aos.hpp
+        utest_compress_aos.cpp
+        utest_compress_aos.cpp
 )
 
 # Vincular Google Test

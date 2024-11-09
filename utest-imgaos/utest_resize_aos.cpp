@@ -1,13 +1,7 @@
 //
 // Created by mapor on 02/11/2024.
 //
-
-#include "./imgaos/resize.hpp"
-#include <gtest/gtest.h>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <fstream>
+#include "utest_aos.hpp"
 
 // Test interpolation functions for 8-bit values
 TEST(InterpolationTest, Interpolate8) {
