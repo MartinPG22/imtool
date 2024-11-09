@@ -37,4 +37,5 @@ constexpr int n_65535 = 65535;
 constexpr int n_0x000000FF = 0x000000FF;
 constexpr int n_0x0000FF00 = 0x0000FF00;
 constexpr int n_0x00FF0000 = 0x00FF0000;
+ImageSOA createTestImage();
 #endif //UTEST_SOA_HPP
