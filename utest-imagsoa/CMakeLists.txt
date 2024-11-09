@@ -1,5 +1,6 @@
 add_executable(utest-imgsoa
         utest_compress_soa.cpp
+        utest_resize_soa.cpp
 
 )
 
