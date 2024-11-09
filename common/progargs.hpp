@@ -24,6 +24,7 @@
 //#include "../imgsoa/resize.hpp"
 #include "../imgsoa/cutfreq.hpp"
 #include "../imgsoa/compress.hpp"
+#include "../imgsoa/resize.hpp"
 
 constexpr size_t ARG_RESIZE = 5;
 constexpr int MAX_NEW_LEVEL = 65535;

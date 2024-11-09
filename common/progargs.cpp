@@ -123,7 +123,7 @@ int executeResize(const std::vector<std::string>& arguments, PPMMetadata& metada
     } else if (method == "soa") {
         ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
         //imprimirImagenSOA(imagensrcSOA, metadata);
-        //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
+        ImageSOA const resizedImage = resizeSOA(imagensrcSOA, metadata, newSize, outputPath);
     }
     std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
     return 0;
