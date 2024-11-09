@@ -16,8 +16,18 @@ size_t determinePixelSize(size_t colorCount) {
 }
 
 // Escribe un arreglo de bytes en el archivo
-void writeBytes(std::ofstream& file, const std::vector<char>& buffer) {
-    file.write(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+void writeBytes(std::ofstream& file, const std::vector<uint8_t>& buffer) {
+    std::cout << "Escribiendo bytes: ";
+    for (const uint8_t& byte : buffer) {
+        std::cout << static_cast<int>(byte) << " ";  // Convertir el byte a int para imprimir el valor numérico
+    }
+    std::cout << '\n';
+
+    // Convertir explícitamente de uint8_t a char
+    std::vector<char> charBuffer(buffer.begin(), buffer.end());
+
+    // Escribir los datos en el archivo como char
+    file.write(charBuffer.data(), static_cast<std::streamsize>(charBuffer.size()));
 }
 
 // Escribe la tabla de colores en el archivo
@@ -34,9 +44,7 @@ void writeColorTable(std::ofstream& file, const std::vector<std::tuple<int, int,
                 static_cast<uint8_t>(gTabla),
                 static_cast<uint8_t>(bTabla)
             };
-
-            std::vector<char> buffer(rgb.size());
-            std::ranges::copy(rgb, buffer.begin());
+            std::vector<uint8_t> const buffer(rgb.begin(), rgb.end());
             writeBytes(file, buffer); // Escribe los bytes en el archivo
         } else {
             constexpr int size_6 = 6;
@@ -54,7 +62,8 @@ void writeColorTable(std::ofstream& file, const std::vector<std::tuple<int, int,
             rgb[B_LSB] = static_cast<uint8_t>(bTabla & MAX_PIXEL_VALUE);       // LSB de B
             rgb[B_MSB] = static_cast<uint8_t>(bTabla >> BYTE_SIZE);    // MSB de B
 
-            std::vector<char> buffer(rgb.size());
+            // Aquí cambiamos el tipo de buffer a uint8_t en lugar de char
+            std::vector<uint8_t> buffer(rgb.size());  // Cambiado a uint8_t
             std::ranges::copy(rgb, buffer.begin());
             writeBytes(file, buffer); // Escribe los bytes en el archivo
         }
@@ -72,30 +81,31 @@ void writePixelData(std::ofstream& file, const PixelData& pixelData, size_t pixe
 
         if (pixelSize == 1) {
             auto const indexByte = static_cast<uint8_t>(index);
-            std::vector<char> buffer(1);
-            buffer[0] = static_cast<char>(indexByte);
+            std::vector<uint8_t> buffer(1);  // Cambié a uint8_t
+            buffer[0] = indexByte;
             writeBytes(file, buffer); // Escribe los bytes en el archivo
         } else if (pixelSize == 2) {
             std::array<uint8_t, 2> indexBytes = {
                 static_cast<uint8_t>(index & MAX_PIXEL_VALUE),       // LSB
-                static_cast<uint8_t>(index >> BYTE_SIZE)          // MSB
+                static_cast<uint8_t>(index >> BYTE_SIZE)             // MSB
             };
-            std::vector<char> buffer(indexBytes.size());
+            std::vector<uint8_t> buffer(indexBytes.size());  // Cambié a uint8_t
             std::ranges::copy(indexBytes, buffer.begin());
             writeBytes(file, buffer); // Escribe los bytes en el archivo
         } else {
             std::array<uint8_t, 4> indexBytes = {
                 static_cast<uint8_t>(index & MAX_PIXEL_VALUE),
                 static_cast<uint8_t>((index >> BYTE_SIZE) & MAX_PIXEL_VALUE),
-                static_cast<uint8_t>((index >> BYTE_SIZE*2) & MAX_PIXEL_VALUE),
-                static_cast<uint8_t>((index >> BYTE_SIZE*3) & MAX_PIXEL_VALUE)
+                static_cast<uint8_t>((index >> (BYTE_SIZE*2)) & MAX_PIXEL_VALUE),
+                static_cast<uint8_t>((index >> (BYTE_SIZE*3)) & MAX_PIXEL_VALUE)
             };
-            std::vector<char> buffer(indexBytes.size());
+            std::vector<uint8_t> buffer(indexBytes.size());  // Cambié a uint8_t
             std::ranges::copy(indexBytes, buffer.begin());
             writeBytes(file, buffer); // Escribe los bytes en el archivo
         }
     }
 }
+
 
 // Función para preparar los canales de color y la tabla de colores
 PixelData prepareColorChannels(const ImageSOA& image, std::unordered_map<std::tuple<int, int, int>, uint32_t, TupleHash>& colorTable) {

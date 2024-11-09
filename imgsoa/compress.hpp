@@ -34,7 +34,8 @@ struct PixelData {
 };
 void writeCPPMSOA(const ImageSOA& image, const std::string& filename, const PPMMetadata& metadata);
 size_t determinePixelSize(size_t colorCount);
-void writeBytes(std::ofstream& file, const std::vector<char>& buffer);
+//void writeBytes(std::ofstream& file, const std::vector<char>& buffer);
+void writeBytes(std::ofstream& file, const std::vector<uint8_t>& buffer);
 void writeColorTable(std::ofstream& file, const std::vector<std::tuple<int, int, int>>& colorList, size_t colorBytes);
 void writePixelData(std::ofstream& file, const PixelData& pixelData, size_t pixelSize);
 PixelData prepareColorChannels(const ImageSOA& image, std::unordered_map<std::tuple<int, int, int>, uint32_t, TupleHash>& colorTable);
