@@ -169,3 +169,4 @@ void cutfreqSOA(ImageSOA& srcImage, const PPMMetadata& metadata, int nColores,
     // Aplicar reemplazos y guardar la imagen
     applyReplacementsAndSave(srcImage, replacementMap, metadata, outputPath);
 }
+

@@ -4,8 +4,6 @@
 
 #include "binaryio.hpp"
 
-
-
 // Función para leer un archivo binario y devolver un vector de bytes
 std::vector<uint8_t> readBinaryFile(const std::string& filename) {
   std::ifstream file(filename, std::ios::binary);
