@@ -2,7 +2,8 @@
 // Created by mapor on 26/10/2024.
 //
 #include "compress.hpp"
-#include <set>
+
+// Sobrecarga de `operator==` para `Pixel8`
 bool operator==(const Pixel8& lhs, const Pixel8& rhs) {
     return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b;
 }
@@ -43,8 +44,6 @@ struct ColorData {
     std::set<Pixel8, ColorCompare> colorTable8;
     std::set<Pixel16, ColorCompare> colorTable16;
 };
-
-
 
 // Función para llenar el buffer con la tabla de colores y la secuencia de píxeles
 namespace {

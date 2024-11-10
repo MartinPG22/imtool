@@ -14,7 +14,7 @@
 #include <variant>
 #include <vector>
 #include <cstdint>
-
+#include <set>
 template <typename T>
 struct Color {
   std::array<T, 3> components; // Usar un array para almacenar los componentes

@@ -2,7 +2,6 @@
 add_library(common
         progargs.cpp
         binaryio.cpp
-        other_2.cpp
         progargs.hpp
         binaryio.hpp
         ../utest-imagsoa/utest_soa.hpp
