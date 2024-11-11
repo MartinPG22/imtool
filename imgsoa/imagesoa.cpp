@@ -69,6 +69,36 @@ namespace {
             blue[i] = static_cast<uint16_t>(b_low | (b_high << BYTE_SIZE));
         }
     }
+    // Helper function to write PPM header
+    void writePPMHeader(std::ofstream& outFile, const PPMMetadata& metadata, const int maxLevel) {
+        outFile << "P6\n" << metadata.width << " " << metadata.height << "\n" << maxLevel << "\n";
+    }
+    struct ColorChannels8 {
+        std::vector<uint8_t> red;
+        std::vector<uint8_t> green;
+        std::vector<uint8_t> blue;
+    };
+    // Helper function to write 8-bit pixel data
+    void writePixelData8(std::ofstream& outFile, const ColorChannels8& channels) {
+        for (size_t i = 0; i < channels.red.size(); ++i) {
+            outFile.put(static_cast<char>(channels.red[i]));
+            outFile.put(static_cast<char>(channels.green[i]));
+            outFile.put(static_cast<char>(channels.blue[i]));
+        }
+    }
+    struct ColorChannels16 {
+        std::vector<uint16_t> red;
+        std::vector<uint16_t> green;
+        std::vector<uint16_t> blue;
+    };
+    // Helper function to write 16-bit pixel data
+    void writePixelData16(std::ofstream& outFile, const ColorChannels16& channels) {
+        for (size_t i = 0; i < channels.red.size(); ++i) {
+            outFile.put(static_cast<char>(channels.red[i]));
+            outFile.put(static_cast<char>(channels.green[i]));
+            outFile.put(static_cast<char>(channels.blue[i]));
+        }
+    }
 }
 
 /**
@@ -134,9 +164,7 @@ int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, const in
         return 1;
     }
     // Check channel sizes
-    if (std::holds_alternative<std::vector<uint8_t>>(srcImage.redChannel) &&
-        std::holds_alternative<std::vector<uint8_t>>(srcImage.greenChannel) &&
-        std::holds_alternative<std::vector<uint8_t>>(srcImage.blueChannel)) {
+    if (std::holds_alternative<std::vector<uint8_t>>(srcImage.redChannel)) {
         auto redChannel = std::get<std::vector<uint8_t>>(srcImage.redChannel);
         auto greenChannel = std::get<std::vector<uint8_t>>(srcImage.greenChannel);
         auto blueChannel = std::get<std::vector<uint8_t>>(srcImage.blueChannel);
@@ -145,17 +173,10 @@ int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, const in
             std::cerr << "Channel sizes do not match!" << '\n';
             return 1;
         }
-        // Escribir el encabezado
-        outFile << "P6\n" << metadata.width << " " << metadata.height << "\n" << maxLevel << "\n";
-        // Escribir los valores de los píxeles en el formato binario
-        for (size_t i = 0; i < redChannel.size(); ++i) {
-            outFile.put(static_cast<char>(redChannel[i]));
-            outFile.put(static_cast<char>(greenChannel[i]));
-            outFile.put(static_cast<char>(blueChannel[i]));
-        }
-    } else if (std::holds_alternative<std::vector<uint16_t>>(srcImage.redChannel) &&
-           std::holds_alternative<std::vector<uint16_t>>(srcImage.greenChannel) &&
-           std::holds_alternative<std::vector<uint16_t>>(srcImage.blueChannel)) {
+        writePPMHeader(outFile, metadata, maxLevel);
+        ColorChannels8 const channels8{.red=redChannel, .green=greenChannel, .blue=blueChannel};
+        writePixelData8(outFile, channels8);
+    } else if (std::holds_alternative<std::vector<uint16_t>>(srcImage.redChannel)) {
         auto redChannel = std::get<std::vector<uint16_t>>(srcImage.redChannel);
         auto greenChannel = std::get<std::vector<uint16_t>>(srcImage.greenChannel);
         auto blueChannel = std::get<std::vector<uint16_t>>(srcImage.blueChannel);
@@ -164,14 +185,9 @@ int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, const in
             std::cerr << "Channel sizes do not match!" << '\n';
             return 1;
         }
-        // Escribir el encabezado
-        outFile << "P6\n" << metadata.width << " " << metadata.height << "\n" << maxLevel << "\n";
-        // Escribir los valores de los píxeles en el formato binario
-        for (size_t i = 0; i < redChannel.size(); ++i) {
-            outFile.put(static_cast<char>(redChannel[i] * maxLevel / MAX_16));
-            outFile.put(static_cast<char>(greenChannel[i] * maxLevel / MAX_16));
-            outFile.put(static_cast<char>(blueChannel[i] * maxLevel / MAX_16));
-        }
+        writePPMHeader(outFile, metadata, maxLevel);
+        ColorChannels16 const channels16{.red=redChannel, .green=greenChannel, .blue=blueChannel};
+        writePixelData16(outFile, channels16);
     } else {
         std::cerr << "Unsupported pixel format!" << '\n';
         return 1;

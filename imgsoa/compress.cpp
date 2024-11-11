@@ -6,13 +6,13 @@
 
 
 // Determina el tamaño del píxel según el número de colores
-size_t determinePixelSize(size_t colorCount) {
-    if (colorCount <= 256) {
+size_t determinePixelSize(const size_t colorCount) {
+    if (colorCount <= MAX_COLOR) {
         return 1;
     } if (colorCount <= MAX_16) {
         return 2;
-    }         return 4;
-
+    }
+    return 4;
 }
 
 // Escribe un arreglo de bytes en el archivo

@@ -3,37 +3,37 @@
 // Función para combinar colores RGB (8 bits por canal)
 template <typename T>
 constexpr u_int64_t combineRGB(const Color<T>& color) {
-    return (static_cast<uint64_t>(color.r()) << 16) |
-           (static_cast<uint64_t>(color.g()) << 8) |
+    return (static_cast<uint64_t>(color.r()) << RED_SHIFT) |
+           (static_cast<uint64_t>(color.g()) << GREEN_SHIFT) |
            static_cast<uint64_t>(color.b());
 }
 
 // Función para combinar colores RGB48 (16 bits por canal)
 template <typename T>
 constexpr u_int64_t combineRGB48(const Color<T>& color) {
-    return (static_cast<uint64_t>(color.r() & 0xFFFF) << 32) |
-           (static_cast<uint64_t>(color.g() & 0xFFFF) << 16) |
-           (static_cast<uint64_t>(color.b() & 0xFFFF));
+    return (static_cast<uint64_t>(color.r() & COLOR_MASK_16BIT) << RED_SHIFT_48) |
+           (static_cast<uint64_t>(color.g() & COLOR_MASK_16BIT) << GREEN_SHIFT_48) |
+           (static_cast<uint64_t>(color.b() & COLOR_MASK_16BIT));
 }
 
 // Función para extraer colores RGB8
 template <typename T>
-constexpr Color<T> extractRGB8(uint64_t rgb) {
+constexpr Color<T> extractRGB8(const uint64_t rgb) {
     // Extraer componentes para uint8_t (asumiendo que rgb es un entero de 24 bits)
-    T blue = rgb & 0xFF;                          // Últimos 8 bits son B
-    T green = (rgb >> 8) & 0xFF;                  // Siguientes 8 bits son G
-    T red = (rgb >> 16) & 0xFF;                   // Primeros 8 bits son R
+    T blue = rgb & MAX_COLOR_VALUE_16UINT;                          // Últimos 8 bits son B
+    T green = (rgb >> MIN_PIXEL_VALUE) & MAX_COLOR_VALUE_16UINT;                  // Siguientes 8 bits son G
+    T red = (rgb >> MIN_PIXEL_VALUE_16) & MAX_COLOR_VALUE_16UINT;                   // Primeros 8 bits son R
 
     return Color<T>(red, green, blue);
 }
 
 // Función para extraer colores RGB48
 template <typename T>
-constexpr Color<T> extractRGB48(uint64_t rgb) {
+constexpr Color<T> extractRGB48(const uint64_t rgb) {
     // Extraer componentes para uint16_t (asumiendo que rgb es un entero de 64 bits)
-    uint16_t red = (rgb >> 32) & 0xFFFF;   // Primeros 16 bits son R
-    uint16_t green = (rgb >> 16) & 0xFFFF; // Siguientes 16 bits son G
-    uint16_t blue = rgb & 0xFFFF;          // Últimos 16 bits son B
+    const uint16_t red = (rgb >> RED_SHIFT_48) & COLOR_MASK_16BIT;   // Primeros 16 bits son R
+    const uint16_t green = (rgb >> GREEN_SHIFT_48) & COLOR_MASK_16BIT; // Siguientes 16 bits son G
+     const uint16_t blue = rgb & COLOR_MASK_16BIT;          // Últimos 16 bits son B
 
     return Color<T>(red, green, blue);
 }
@@ -61,7 +61,7 @@ void countColorFrequency(const ImageAOS& srcImage, std::unordered_map<uint64_t, 
 
 // Ordenar los colores por frecuencia y luego por componentes de color
 void sortColorsByFrequency(std::unordered_map<uint64_t, int>& colorFrequency, std::vector<std::tuple<int, Color<int>>>& colorData, int maxLevel) {
-    if (maxLevel <= 255) {
+    if (maxLevel <= METATADATA_MAX_VALUE) {
         for (const auto& [key, frequency] : colorFrequency) {
             Color<int> const color = extractRGB8<int>(key);
             colorData.emplace_back(frequency, color);
@@ -116,10 +116,10 @@ void createReplacementMap(const ColorGroups& colorGroups,
                           std::unordered_map<uint64_t, Color<int>>& replacementMap) {
     for (const auto& [freqRem, colorRem] : colorGroups.colorsToRemove) {
         // Supongamos que tienes una manera de determinar si el color es de tipo Pixel8 o Pixel16
-        uint64_t key;
+        uint64_t key = 0;
 
         // Determina la forma de combinación según el rango de valores del color
-        if (colorRem.r() <= 255 && colorRem.g() <= 255 && colorRem.b() <= 255) {
+        if (colorRem.r() <= METATADATA_MAX_VALUE && colorRem.g() <= METATADATA_MAX_VALUE && colorRem.b() <= METATADATA_MAX_VALUE) {
             // Usar combineRGB para Pixel8
             key = combineRGB(colorRem);
         } else {

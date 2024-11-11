@@ -16,14 +16,26 @@ constexpr int changeBits16 = 16;
 constexpr uint8_t MAX_PIXEL_VALUE = 0xFF; // Valor máximo para píxeles de 8 bits
 constexpr int METATADATA_MAX_VALUE = 255;
 constexpr int BYTE_SIZE = 8;
+constexpr size_t MAX_COLOR = 256;
 
 constexpr int MAX_8 = 255;
 constexpr int changeBits = 8;
+
+constexpr uint8_t RED_SHIFT = 16;
+constexpr uint8_t GREEN_SHIFT = 8;
+constexpr uint16_t COLOR_MASK_16BIT = 0xFFFF;
+constexpr uint8_t RED_SHIFT_48 = 32;
+constexpr uint8_t GREEN_SHIFT_48 = 16;
 
 constexpr int buffer_size_8 = 3;
 constexpr int buffer_size_16 = 6;
 constexpr int MAX_COLOR_VALUE = 0xFF;
 constexpr uint8_t MIN_PIXEL_VALUE = 8;
+constexpr uint8_t MIN_PIXEL_VALUE_16 = 16;
+constexpr uint8_t MAX_COLOR_VALUE_16UINT = 0xFF;
+
+constexpr int MAX_COLOR_VALUE_16 = 0xFFFF;
+constexpr int MAX_INT32 = 32;
 
 // Estructura para almacenar los metadatos de la imagen
 struct PPMMetadata {
