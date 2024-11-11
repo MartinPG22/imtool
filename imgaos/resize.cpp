@@ -28,63 +28,69 @@ Pixel16 interpolatePixel(const Pixel16& p00, const Pixel16& p01, float ttt) {
     result.b = interpolate16(p00.b, p01.b, ttt);
     return result;
 }
-
-    // Función para guardar una imagen PPM de 8 bits
-void savePixelsToPPM8(const std::string& outputPath, const std::vector<Pixel8>& pixels, const std::vector<size_t>& newSize, size_t intensidad ) {
-    size_t const newWidth = newSize[0];
-    size_t const newHeight = newSize[1];
-    std::ofstream outFile(outputPath, std::ios::binary);
-    if (!outFile.is_open()) {
-        std::cerr << "No se pudo abrir el archivo de salida" << '\n';
-        return; // Salir si no se puede abrir el archivo
-    }// Puede que este mal la intensidad del encabezado
-    outFile << "P6\n" << newWidth << " " << newHeight << "\n" << intensidad << "\n"; // Encabezado para Pixel8
-    for (const auto& pixel : pixels) {
-        outFile.put(static_cast<char>(pixel.r));
-        outFile.put(static_cast<char>(pixel.g));
-        outFile.put(static_cast<char>(pixel.b));
-    }
-    outFile.close();
+template<typename T>
+T getPixel(const std::vector<T>& pixels, size_t width, size_t hor, size_t ver) {
+    return pixels[(ver * width) + hor];
 }
 
-// Función para guardar una imagen PPM de 16 bits
-void savePixelsToPPM16(const std::string& outputPath, const std::vector<Pixel16>& pixels, const std::vector<size_t>& newSize, size_t intensidad ) {
-    size_t const newWidth = newSize[0];
-    size_t const newHeight = newSize[1];
-    std::ofstream outFile(outputPath, std::ios::binary);
-    if (!outFile.is_open()) {
-        std::cerr << "No se pudo abrir el archivo de salida" << '\n';
-        return; // Salir si no se puede abrir el archivo
+template<typename T>
+std::vector<T> resizePixels(const std::vector<T>& srcPixels, const PPMMetadata& metadata, size_t newWidth, size_t newHeight) {
+    std::vector<T> dstPixels(newWidth * newHeight);
+    for (size_t y_prime = 0; y_prime < newHeight; ++y_prime) {
+        for (size_t x_prime = 0; x_prime < newWidth; ++x_prime) {
+            double const xOrig = static_cast<double>(x_prime) * static_cast<double>(metadata.width) / static_cast<double>(newWidth);
+            double const yOrig = static_cast<double>(y_prime) * static_cast<double>(metadata.height) / static_cast<double>(newHeight);
+
+            auto xlow = static_cast<size_t>(std::floor(xOrig));
+            auto xhigh = static_cast<size_t>(std::ceil(xOrig));
+            auto ylow = static_cast<size_t>(std::floor(yOrig));
+            auto yhigh = static_cast<size_t>(std::ceil(yOrig));
+
+            xlow = std::min(xlow, metadata.width - 1);
+            xhigh = std::min(xhigh, metadata.width - 1);
+            ylow = std::min(ylow, metadata.height - 1);
+            yhigh = std::min(yhigh, metadata.height - 1);
+
+
+            T color1 = interpolatePixel(
+            getPixel(srcPixels, metadata.width, xlow, ylow),
+            getPixel(srcPixels, metadata.width, xhigh, ylow),
+            static_cast<float>(xOrig - static_cast<double>(xlow))  // Convierte xl a double antes de la resta
+            );
+
+            T color2 = interpolatePixel(
+            getPixel(srcPixels, metadata.width, xlow, yhigh),
+            getPixel(srcPixels, metadata.width, xhigh, yhigh),
+            static_cast<float>(xOrig - static_cast<double>(xlow))  // Convierte xl a double antes de la resta
+            );
+
+            dstPixels[(y_prime * newWidth) + x_prime] = interpolatePixel(color1, color2, static_cast<float>(yOrig - static_cast<double>(ylow)));  // Convierte yl a double
+        }
     }
-    outFile << "P6\n" << newWidth << " " << newHeight << "\n" << intensidad << "\n"; // Encabezado para Pixel16
-    for (const auto& pixel : pixels) {
-        outFile.put(static_cast<char>(pixel.r >> changeBits)); // Escribir el byte alto
-        outFile.put(static_cast<char>(pixel.r & MAX_PIXEL_VALUE)); // Escribir el byte bajo
-        outFile.put(static_cast<char>(pixel.g >> changeBits)); // Escribir el byte alto
-        outFile.put(static_cast<char>(pixel.g & MAX_PIXEL_VALUE)); // Escribir el byte bajo
-        outFile.put(static_cast<char>(pixel.b >> changeBits)); // Escribir el byte alto
-        outFile.put(static_cast<char>(pixel.b & MAX_PIXEL_VALUE)); // Escribir el byte bajo
-    }
-    outFile.close();
+    return dstPixels;
 }
+
 
 // Función principal para redimensionar la imagen
 ImageAOS resize(const ImageAOS& srcImage, const PPMMetadata& metadata, const std::vector<size_t>& newSize, const std::string& outputPath) {
     ImageAOS dstImage;
     size_t const newWidth = newSize[0];
     size_t const newHeight = newSize[1];
-    auto const intensidad = static_cast<size_t>(metadata.max_value);
     if (std::holds_alternative<std::vector<Pixel8>>(srcImage.pixels)) {
         const auto& srcPixels = std::get<std::vector<Pixel8>>(srcImage.pixels);
         dstImage.pixels = resizePixels(srcPixels, metadata, newWidth, newHeight);
-        savePixelsToPPM8(outputPath, std::get<std::vector<Pixel8>>(dstImage.pixels), newSize, intensidad);
+
     } else if (std::holds_alternative<std::vector<Pixel16>>(srcImage.pixels)) {
         const auto& srcPixels = std::get<std::vector<Pixel16>>(srcImage.pixels);
         dstImage.pixels = resizePixels(srcPixels, metadata, newWidth, newHeight);
-        savePixelsToPPM16(outputPath, std::get<std::vector<Pixel16>>(dstImage.pixels), newSize, intensidad);
     }
+    // Tengo que crear un nuevo metadata con las nuevas dimensiones
+    PPMMetadata newMetadata{};
+    newMetadata.width = newWidth;
+    newMetadata.height = newHeight;
 
-    std::cout << "La imagen con el nuevo nivel máximo de intensidad se ha guardado en " << outputPath << '\n';
+    saveAOStoPPM(dstImage, newMetadata, metadata.max_value, outputPath);
+    std::cout << "La imagen con el nuevo tamaño se ha guardado en " << outputPath << '\n';
     return dstImage;
 }
 

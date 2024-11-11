@@ -2,9 +2,9 @@
 add_library(common
         progargs.cpp
         binaryio.cpp
-        other_2.cpp
         progargs.hpp
         binaryio.hpp
+        ../utest-imagsoa/utest_soa.hpp
 )
 # Link imgsoa with common
 target_link_libraries(common PUBLIC imgsoa)

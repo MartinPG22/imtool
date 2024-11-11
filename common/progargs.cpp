@@ -13,6 +13,7 @@ int executeInfo(const std::vector<std::string>& arguments, const PPMMetadata& me
     const std::string& inputPath = arguments[0];
     const std::string& outputPath = arguments[1];
     const std::string& operation = arguments[2];
+    // Para poder sacar los argumentos de info e imprimirlos en caso de error
     std::vector<std::string> copia_arg;
     copia_arg.assign(arguments.begin()+3, arguments.end());
 
@@ -25,7 +26,7 @@ int executeInfo(const std::vector<std::string>& arguments, const PPMMetadata& me
         return -1;
     }
     //execute modulo para el info
-    std::cout << "(DEPURACION) Executing 'info' operation on: " << inputPath << '\n';
+    std::cout << "Executing 'info' operation on: " << inputPath << '\n';
     std::cout << "Input: " << inputPath << '\n';
     std::cout << "Out: " << outputPath << '\n';
     std::cout << "Operation: " << operation << '\n';
@@ -37,8 +38,7 @@ int executeInfo(const std::vector<std::string>& arguments, const PPMMetadata& me
 int executeMaxlevel(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method) {
     const std::string& inputPath = arguments[0];
     const std::string& outputPath = arguments[1];
-    const std::string& operation = arguments[2];
-    std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
+
     if (method == "soa") {
         ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
     } else if (method == "aos") {
@@ -103,35 +103,29 @@ int argumentsResize(const std::vector<std::string>& arguments) {
         std::cerr << "Error: Invalid resize height: " << arguments[4] << '\n';
         return -1;
     }
-    std::cout << "(Depuracion) He pasado las condiciones de parametros " <<'\n';
     return 0;
 }
 
 int executeResize(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method) {
     const std::string& inputPath = arguments[0];
     const std::string& outputPath = arguments[1];
-    const std::string& operation = arguments[2];
 
     if (argumentsResize(arguments) ==-1){return -1;};
-    std::cout << "(Depuracion) Llego al resize " << inputPath << '\n';
     std::vector<size_t> const newSize = {std::stoul(arguments[3]), std::stoul(arguments[4])};
     //
-    std::cout << "(Depuration) Executing 'resize' operation on: " << inputPath << '\n';
+    std::cout << "Executing 'resize' operation on: " << inputPath << '\n';
     if (method == "aos") {
         ImageAOS const imagensrcAOS = cargarImagenPPMAOS(inputPath, metadata);
         ImageAOS const resizedImage = resize(imagensrcAOS, metadata, newSize, outputPath);
     } else if (method == "soa") {
         ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
-        //imprimirImagenSOA(imagensrcSOA, metadata);
-        //ImageSOA resizedImage = resize(imagensrcSOA, metadata, newWidth, newHeight);
+        ImageSOA const resizedImage = resizeSOA(imagensrcSOA, metadata, newSize, outputPath);
     }
-    std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
     return 0;
 }
 int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method) {
     const std::string& inputPath = arguments[0];
     const std::string& outputPath = arguments[1];
-    const std::string& operation = arguments[2];
 
     if (arguments.size() != 4) {
         std::cerr << "Error: Invalid number of extra arguments for cutfreq: " << arguments.size() - 3 << '\n';
@@ -146,6 +140,7 @@ int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metad
         std::cerr << "Error: Invalid cutfreq: " << arguments[3] << '\n';
         return -1;
     }
+    std::cout << "Executing 'cutfreq' operation with number of colors: " << numberOfColors << " on: " << inputPath << '\n';
     if (method == "aos") {
         ImageAOS imagensrcAOS = cargarImagenPPMAOS(inputPath, metadata);
         cutfreq(imagensrcAOS,metadata,numberOfColors, outputPath);
@@ -153,23 +148,14 @@ int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metad
         // Load the image as SOA
         ImageSOA imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
 
-        // Create frequency map
-        std::unordered_map<int, int> colorFrequency;
-        countColorFrequency(imagensrcSOA, colorFrequency);
-
         // Apply cutfreq
         cutfreqSOA(imagensrcSOA, metadata, numberOfColors, outputPath);
     }
-    std::cout << "Executing 'cutfreq' operation with number of colors: " << numberOfColors << " on: " << inputPath << '\n';
-    std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
     return 0;
 }
 int executeCompress(const std::vector<std::string>& arguments, PPMMetadata& metadata, const std::string& method){
     const std::string& inputPath = arguments[0];
     const std::string& outputPath = arguments[1];
-    const std::string& operation = arguments[2];
-
-    // Declara las variables antes de usarlas
 
     if (arguments.size() != 3) {
         std::cerr << "Error: Invalid extra arguments for compress: " << arguments.size() - 3 << '\n';
@@ -185,7 +171,6 @@ int executeCompress(const std::vector<std::string>& arguments, PPMMetadata& meta
         //imprimirImagenSOA(imagensrcSOA, metadata);
         writeCPPMSOA(imagensrcSOA, outputPath, metadata);
     }
-    std::cout << "(DEPURACION) LLamando a todos los argumentos para evitar errores de clangtidy" << inputPath << outputPath << operation<<'\n';
     return 0;
 }
 
@@ -203,7 +188,6 @@ int executeOperation(const std::vector<std::string>& arguments,const std::string
     }
     PPMMetadata metadata = readPPMMetadata(inputPath);
 
-    std::cout << "(Depuracion) Llego aqui " << inputPath << '\n';
     if (operation == "info") { executeInfo(arguments, metadata);
     } else if (operation == "maxlevel") {executeMaxlevel(arguments, metadata, method);
     } else if (operation == "resize") {executeResize(arguments, metadata, method);

@@ -16,8 +16,6 @@
 #include "imagesoa.hpp"
 #include "./common/binaryio.hpp"
 
-
-
 // Function declarations matching cutfreq.cpp
 void countColorFrequency(const ImageSOA& srcImage, std::unordered_map<int, int>& colorFrequency);
 void applyColorReplacement(ImageSOA& srcImage, const std::unordered_map<int, std::tuple<int, int, int>>& replacementMap);
@@ -33,4 +31,5 @@ std::unordered_map<int, std::tuple<int, int, int>> createReplacementMap(
 void applyReplacementsAndSave(ImageSOA& srcImage,
                               const std::unordered_map<int, std::tuple<int, int, int>>& replacementMap,
                               const PPMMetadata& metadata, const std::string& outputPath);
+
 #endif // CUTFREQ_SOA_HPP

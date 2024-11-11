@@ -1,0 +1,41 @@
+//
+// Created by mapor on 09/11/2024.
+//
+
+#ifndef UTEST_SOA_HPP
+#define UTEST_SOA_HPP
+
+#include <gtest/gtest.h>
+#include <vector>
+#include <string>
+#include <sstream>
+#include "./imgsoa/resize.hpp"
+#include "./imgsoa/cutfreq.hpp"
+#include "imgsoa/imagesoa.hpp"
+#include "./common/binaryio.hpp"
+#include <filesystem>
+constexpr int n_5 = 5;
+constexpr int n_9 = 9;
+constexpr int n_32 = 32;
+constexpr int n_64 = 64;
+constexpr int n_65 = 65;
+constexpr int n_66 = 66;
+constexpr int n_67 = 67;
+constexpr int n_68 = 68;
+constexpr int n_69 = 69;
+constexpr int n_128 = 128;
+constexpr int n_255 = 255;
+constexpr int n_300 = 300;
+constexpr int n_400 = 400;
+constexpr int n_3000 = 3000;
+constexpr int n_7500 = 7500;
+constexpr int n_15000 = 15000;
+constexpr int n_30000 = 30000;
+constexpr int n_65534 = 65534;
+constexpr int n_65535 = 65535;
+
+constexpr int n_0x000000FF = 0x000000FF;
+constexpr int n_0x0000FF00 = 0x0000FF00;
+constexpr int n_0x00FF0000 = 0x00FF0000;
+ImageSOA createTestImage();
+#endif //UTEST_SOA_HPP

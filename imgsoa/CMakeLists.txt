@@ -8,4 +8,6 @@ add_library(imgsoa
         cutfreq.hpp
         maxlevel.cpp
         maxlevel.hpp
+        resize.cpp
+        resize.hpp
 )
