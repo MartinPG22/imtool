@@ -14,7 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Set compiler options
 add_compile_options(-Wall -Wextra -Werror -pedantic -pedantic-errors -Wconversion -Wsign-conversion)  # Corrección aquí
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")  # Corrección aquí
-
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -funroll-loops")
 # Support FetchContent functionality
 include(FetchContent)
 # Unit tests with google test

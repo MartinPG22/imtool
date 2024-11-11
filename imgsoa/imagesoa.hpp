@@ -14,10 +14,6 @@
 #include <array>
 #include "./common/binaryio.hpp"
 
-
-
-
-
 // Estructura que representa la imagen en formato SOA (Structure of Arrays)
 struct ImageSOA {
   std::variant<std::vector<uint8_t>, std::vector<uint16_t>> redChannel; // Vector de píxeles (estructura SOA)

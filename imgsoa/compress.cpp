@@ -17,11 +17,11 @@ size_t determinePixelSize(size_t colorCount) {
 
 // Escribe un arreglo de bytes en el archivo
 void writeBytes(std::ofstream& file, const std::vector<uint8_t>& buffer) {
-    std::cout << "Escribiendo bytes: ";
+    /*std::cout << "Escribiendo bytes: ";
     for (const uint8_t& byte : buffer) {
         std::cout << static_cast<int>(byte) << " ";  // Convertir el byte a int para imprimir el valor numérico
     }
-    std::cout << '\n';
+    std::cout << '\n';*/
 
     // Convertir explícitamente de uint8_t a char
     std::vector<char> charBuffer(buffer.begin(), buffer.end());
