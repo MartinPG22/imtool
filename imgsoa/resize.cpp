@@ -71,20 +71,27 @@ ImageSOA resizeSOA(const ImageSOA& srcImage, const PPMMetadata& metadata, const 
     size_t const newHeight = newSize[1];
 
     if (std::holds_alternative<std::vector<uint8_t>>(srcImage.redChannel)) {
-        dstImage.redChannel = resizePixelsSOA(std::get<std::vector<uint8_t>>(srcImage.redChannel), metadata, newWidth, newHeight);
-        dstImage.greenChannel = resizePixelsSOA(std::get<std::vector<uint8_t>>(srcImage.greenChannel), metadata, newWidth, newHeight);
-        dstImage.blueChannel = resizePixelsSOA(std::get<std::vector<uint8_t>>(srcImage.blueChannel), metadata, newWidth, newHeight);
+        // Antes del redimensionado: Tamaños de los canales en la imagen de entrada
+        const auto& redChannel = std::get<std::vector<uint8_t>>(srcImage.redChannel);
+        const auto& greenChannel = std::get<std::vector<uint8_t>>(srcImage.greenChannel);
+        const auto& blueChannel = std::get<std::vector<uint8_t>>(srcImage.blueChannel);
+
+        // Redimensionar los canales
+        dstImage.redChannel = resizePixelsSOA(redChannel, metadata, newWidth, newHeight);
+        dstImage.greenChannel = resizePixelsSOA(greenChannel, metadata, newWidth, newHeight);
+        dstImage.blueChannel = resizePixelsSOA(blueChannel, metadata, newWidth, newHeight);
 
     } else if (std::holds_alternative<std::vector<uint16_t>>(srcImage.redChannel)) {
         dstImage.redChannel = resizePixelsSOA(std::get<std::vector<uint16_t>>(srcImage.redChannel), metadata, newWidth, newHeight);
         dstImage.greenChannel = resizePixelsSOA(std::get<std::vector<uint16_t>>(srcImage.greenChannel), metadata, newWidth, newHeight);
         dstImage.blueChannel = resizePixelsSOA(std::get<std::vector<uint16_t>>(srcImage.blueChannel), metadata, newWidth, newHeight);
     }
-    saveSOAtoPPM(srcImage, metadata, metadata.max_value, outputPath);
+    // Crear un nuevo metadata con el tamaño actualizado
+    PPMMetadata newMetadata = metadata;
+    newMetadata.width = newWidth;
+    newMetadata.height = newHeight;
+
+    saveSOAtoPPM(dstImage, newMetadata, newMetadata.max_value, outputPath);
     std::cout << "La imagen con el nuevo tamaño se ha guardado en " << outputPath << '\n';
     return dstImage;
 }
-
-// Asegúrate de que las plantillas se definan en el archivo de cabecera
-//template std::vector<uint8_t> resizePixelsSOA(const std::vector<uint8_t>& srcPixels, const PPMMetadata& metadata, size_t newWidth, size_t newHeight);
-//template std::vector<uint16_t> resizePixelsSOA(const std::vector<uint16_t>& srcPixels, const PPMMetadata& metadata, size_t newWidth, size_t newHeight);
