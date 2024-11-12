@@ -40,7 +40,7 @@ int executeMaxlevel(const std::vector<std::string>& arguments, PPMMetadata& meta
     const std::string& outputPath = arguments[1];
 
     if (method == "soa") {
-        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        ImageSOA const imagensrcSOA = cargarImagenPPMtoSOA(inputPath, metadata);
     } else if (method == "aos") {
         ImageAOS const imagensrcAOS = cargarImagenPPMAOS(inputPath, metadata);
     }
@@ -63,7 +63,7 @@ int executeMaxlevel(const std::vector<std::string>& arguments, PPMMetadata& meta
         ImageAOS const imagensrcAOS = cargarImagenPPMAOS(inputPath, metadata);
         ImageAOS const res_aos = maxlevelAOS(imagensrcAOS, metadata, std::stoi(arguments[3]), outputPath);
     } else if (method == "soa") {
-        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        ImageSOA const imagensrcSOA = cargarImagenPPMtoSOA(inputPath, metadata);
         ImageSOA const res_soa = maxlevelSOA(imagensrcSOA, metadata, std::stoi(arguments[3]), outputPath);
     }
     return 0;
@@ -117,7 +117,7 @@ int executeResize(const std::vector<std::string>& arguments, PPMMetadata& metada
         ImageAOS const imagensrcAOS = cargarImagenPPMAOS(inputPath, metadata);
         ImageAOS const resizedImage = resize(imagensrcAOS, metadata, newSize, outputPath);
     } else if (method == "soa") {
-        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        ImageSOA const imagensrcSOA = cargarImagenPPMtoSOA(inputPath, metadata);
         ImageSOA const resizedImage = resizeSOA(imagensrcSOA, metadata, newSize, outputPath);
     }
     return 0;
@@ -145,7 +145,7 @@ int executeCutfreq(const std::vector<std::string>& arguments, PPMMetadata& metad
         cutfreq(imagensrcAOS,metadata,numberOfColors, outputPath);
     } else if (method == "soa") {
         // Load the image as SOA
-        ImageSOA imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        ImageSOA imagensrcSOA = cargarImagenPPMtoSOA(inputPath, metadata);
 
         // Apply cutfreq
         cutfreqSOA(imagensrcSOA, metadata, numberOfColors, outputPath);
@@ -166,7 +166,7 @@ int executeCompress(const std::vector<std::string>& arguments, PPMMetadata& meta
         ImageAOS const imagensrcAOS = cargarImagenPPMAOS(inputPath, metadata);
         writeCPPM(imagensrcAOS, outputPath,metadata);
     } else if (method == "soa") {
-        ImageSOA const imagensrcSOA = cargarImagenPPMSOA(inputPath, metadata);
+        ImageSOA const imagensrcSOA = cargarImagenPPMtoSOA(inputPath, metadata);
         //imprimirImagenSOA(imagensrcSOA, metadata);
         writeCPPMSOA(imagensrcSOA, outputPath, metadata);
     }

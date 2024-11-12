@@ -6,6 +6,7 @@
 #define MAXLEVEL_SOA_HPP
 
 #include <iostream>
+#include <algorithm>
 
 #include "imagesoa.hpp"
 

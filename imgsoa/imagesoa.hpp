@@ -21,7 +21,7 @@ struct ImageSOA {
   std::variant<std::vector<uint8_t>, std::vector<uint16_t>> blueChannel; // Vector de píxeles (estructura SOA)
 };
 
-ImageSOA cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& metadata);
+ImageSOA cargarImagenPPMtoSOA(const std::string& nombre_archivo, PPMMetadata& metadata);
 int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, int maxLevel, const std::string& outputPath);
 void imprimirImagenSOA(const ImageSOA& imagen, const PPMMetadata& metadata);
 

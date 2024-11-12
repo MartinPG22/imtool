@@ -13,8 +13,9 @@ namespace {
      * @param archivo The file stream to read the channels from.
      * @param imagen The SOA image to store the channels.
      * @param num_pixels The number of pixels to read.
+     * @param max_value The maximum intensity level.
      */
-    void leerCanales8Bits(std::ifstream& archivo, ImageSOA& imagen, const size_t num_pixels) {
+    void leerCanales8Bits(std::ifstream& archivo, ImageSOA& imagen, const size_t num_pixels, const int max_value) {
         auto& red = std::get<std::vector<uint8_t>>(imagen.redChannel);
         auto& green = std::get<std::vector<uint8_t>>(imagen.greenChannel);
         auto& blue = std::get<std::vector<uint8_t>>(imagen.blueChannel);
@@ -29,6 +30,17 @@ namespace {
 
             archivo.read(buffer.data(), 1);
             blue[i] = static_cast<uint8_t>(buffer[0]);
+
+            if (red[i] > max_value || green[i] > max_value || blue[i] > max_value) {
+                throw std::runtime_error("Valor de píxel inválido");
+            }
+            if (archivo.eof()) {
+                throw std::runtime_error("Número de píxeles incorrecto");
+            }
+        }
+        std::cout << archivo.peek() << '\n';
+        if (archivo.peek() != EOF) {
+            throw std::runtime_error("El archivo contiene más datos de los esperados");
         }
     }
     /** @brief Reads the channels with 16-bit components.
@@ -38,8 +50,9 @@ namespace {
      * @param archivo The file stream to read the channels from.
      * @param imagen The SOA image to store the channels.
      * @param num_pixels The number of pixels to read.
+     * @param max_value The maximum intensity level.
      */
-    void leerCanales16Bits(std::ifstream& archivo, ImageSOA& imagen, const size_t num_pixels) {
+    void leerCanales16Bits(std::ifstream& archivo, ImageSOA& imagen, const size_t num_pixels, const int max_value) {
         auto& red = std::get<std::vector<uint16_t>>(imagen.redChannel);
         auto& green = std::get<std::vector<uint16_t>>(imagen.greenChannel);
         auto& blue = std::get<std::vector<uint16_t>>(imagen.blueChannel);
@@ -67,6 +80,17 @@ namespace {
             red[i] = static_cast<uint16_t>(r_low | (r_high << BYTE_SIZE));
             green[i] = static_cast<uint16_t>(g_low | (g_high << BYTE_SIZE));
             blue[i] = static_cast<uint16_t>(b_low | (b_high << BYTE_SIZE));
+
+            if (red[i] > max_value || green[i] > max_value || blue[i] > max_value) {
+                throw std::runtime_error("Valor de píxel inválido");
+            }
+            if (archivo.eof()) {
+                throw std::runtime_error("Número de píxeles incorrecto");
+            }
+        }
+        std::cout << archivo.peek() << '\n';
+        if (archivo.peek() != EOF) {
+            throw std::runtime_error("El archivo contiene más datos de los esperados");
         }
     }
     // Helper function to write PPM header
@@ -110,38 +134,46 @@ namespace {
  * @param nombre_archivo The path to the PPM file.
  * @param metadata Metadata of the image.
  * @return ImageSOA The image in SOA format.
+ * @throws std::runtime_error If the file cannot be opened or the format is not supported.
  */
-ImageSOA cargarImagenPPMSOA(const std::string& nombre_archivo, PPMMetadata& metadata) {
+ImageSOA cargarImagenPPMtoSOA(const std::string& nombre_archivo, PPMMetadata& metadata) {
     std::ifstream archivo(nombre_archivo, std::ios::binary);
     if (!archivo) {
-        std::cerr << "Error: No se puede abrir el archivo." << '\n';
-        return {};
+        throw std::runtime_error("No se pudo abrir el archivo");
     }
     // Leer el tipo de magia
     std::string magicNumber;
     archivo >> magicNumber;
-    if (magicNumber != "P6") {
-        std::cerr << "Error: Formato no soportado." << '\n';
-        return {};
+    if (magicNumber != "P6" || nombre_archivo.substr(nombre_archivo.size() - 4) != ".ppm") {
+        throw std::runtime_error("Formato de archivo no soportado");
     }
     // Leer dimensiones y valor máximo
-    archivo >> metadata.width >> metadata.height >> metadata.max_value;
+    int width = 0;
+    int height = 0;
+    int max_value = 0;
+    archivo >> width >> height >> max_value;
     archivo.ignore(); // Ignorar el salto de línea después del encabezado
     // Crear la estructura ImageSOA
     ImageSOA imagen;
+    if (width < 0 || height < 0 || max_value < 0) {
+        throw std::runtime_error("Dimensiones de imagen incorrectas");
+    }
+    metadata.width = static_cast<size_t>(width);
+    metadata.height = static_cast<size_t>(height);
+    metadata.max_value = max_value;
     size_t const num_pixels = metadata.width * metadata.height;
     // Leer los píxeles en función del valor máximo
     if (metadata.max_value <= METATADATA_MAX_VALUE) {
         imagen.redChannel = std::vector<uint8_t>(num_pixels);
         imagen.greenChannel = std::vector<uint8_t>(num_pixels);
         imagen.blueChannel = std::vector<uint8_t>(num_pixels);
-        leerCanales8Bits(archivo, imagen, num_pixels);
+        leerCanales8Bits(archivo, imagen, num_pixels, metadata.max_value);
     } else {
         // Caso: 2 bytes por componente (RGB) en formato little-endian
         imagen.redChannel = std::vector<uint16_t>(num_pixels);
         imagen.greenChannel = std::vector<uint16_t>(num_pixels);
         imagen.blueChannel = std::vector<uint16_t>(num_pixels);
-        leerCanales16Bits(archivo, imagen, num_pixels);
+        leerCanales16Bits(archivo, imagen, num_pixels, metadata.max_value);
     }
     return imagen;
 }

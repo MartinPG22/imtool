@@ -25,32 +25,38 @@ namespace {
         return { red, green, blue };
     }
     // Funcion auxiliar para verificar el nivel máximo de intensidad
-    void verifyMaxLevel(const int newMaxLevel, const PPMMetadata& metadata, const ImageSOA& srcImage) {
-        if (is8Bit(srcImage)) {
-            if ((newMaxLevel <= 0) || (newMaxLevel > MAX_COLOR_VALUE)) {
-                throw std::runtime_error("Error: Nivel máximo de intensidad inválido: " + std::to_string(newMaxLevel));
-            }
-            if ((metadata.max_value <= 0) || (metadata.max_value > MAX_COLOR_VALUE)) {
-                throw std::runtime_error("Error: Nivel máximo de intensidad inválido: " + std::to_string(metadata.max_value));
-            }
-        } else if (is16Bit(srcImage)) {
-            if ((newMaxLevel <= MAX_COLOR_VALUE) || (newMaxLevel > MAX_COLOR_VALUE_16)) {
-                throw std::runtime_error("Error: Nivel máximo de intensidad inválido: " + std::to_string(newMaxLevel));
-            }
-            if ((metadata.max_value <= MAX_COLOR_VALUE) || (metadata.max_value > MAX_COLOR_VALUE_16)) {
-                throw std::runtime_error("Error: Nivel máximo de intensidad inválido: " + std::to_string(metadata.max_value));
-            }
-        } else {
-            throw std::runtime_error("Error: Formato de píxeles no compatible\n");
+    void verifyMaxLevel(const int newMaxLevel, const PPMMetadata& metadata) {
+        if ((newMaxLevel <= 0) || (newMaxLevel > MAX_COLOR_VALUE_16)) {
+            throw std::runtime_error("Error: Nivel máximo de intensidad inválido: " + std::to_string(newMaxLevel));
+        }
+        if ((metadata.max_value <= 0) || (metadata.max_value > MAX_COLOR_VALUE_16)) {
+            throw std::runtime_error("Error: Nivel máximo de intensidad inválido: " + std::to_string(metadata.max_value));
         }
     }
+    // Función para convertir de 8 bits a 16 bits
+    template <typename T>
+    std::vector<uint16_t> convertTo16Bit(const std::vector<T>& channel) {
+        std::vector<uint16_t> result(channel.size());
+        std::transform(channel.begin(), channel.end(), result.begin(),
+                       [](T value) { return static_cast<uint16_t>(value); });
+        return result;
+    }
+    // Función para convertir de 16 bits a 8 bits
+    template <typename T>
+    std::vector<uint8_t> convertTo8Bit(const std::vector<T>& channel) {
+        std::vector<uint8_t> result(channel.size());
+        std::transform(channel.begin(), channel.end(), result.begin(),
+                       [](T value) { return static_cast<uint8_t>(value); });
+        return result;
+    }
+
     // Funcion auxiliar que ejecuta el maxlevel para un tipo de píxeles
     template <typename T>
     ImageSOA maxlevelSOAtype(const ImageSOA& srcImage, const PPMMetadata& metadata, const int newMaxLevel, const std::string& outputPath) {
         auto channels = verifyChannels<T>(srcImage);
         auto& [red, green, blue] = channels;
         // Verificar que newMaxLevel y metada.max_level sea válido
-        verifyMaxLevel(newMaxLevel, metadata, srcImage);
+        verifyMaxLevel(newMaxLevel, metadata);
         // Convertir los valores de los píxeles
         std::vector<T> outRed(red.size());
         std::vector<T> outGreen(green.size());
@@ -86,12 +92,40 @@ namespace {
  */
 ImageSOA maxlevelSOA(const ImageSOA& srcImage, const PPMMetadata& metadata, const int newMaxLevel, const std::string& outputPath) {
     // Verificar que tipo de píxeles tiene la imagen
-    if (is8Bit(srcImage)) {
+    // Caso 1: Píxeles de 8-bit y nuevo nivel máximo de intensidad 8-bit
+    if (is8Bit(srcImage) && newMaxLevel <= MAX_COLOR_VALUE) {
         // Ejecutar la función para píxeles de 8 bits
         return maxlevelSOAtype<uint8_t>(srcImage, metadata, newMaxLevel, outputPath);
-    } if (is16Bit(srcImage)) {
+    }
+    // Caso 2: Píxeles de 16-bit y nuevo nivel máximo de intensidad 16-bit
+    if (is16Bit(srcImage) && newMaxLevel > MAX_COLOR_VALUE) {
         // Ejecutar la función para píxeles de 16 bits
         return maxlevelSOAtype<uint16_t>(srcImage, metadata, newMaxLevel, outputPath);
+    }
+    // Caso 3: Píxeles de 8-bit y nuevo nivel máximo de intensidad 16-bit
+    if (is8Bit(srcImage) && newMaxLevel > MAX_COLOR_VALUE) {
+        // Convertir los píxeles a 16-bit
+        const auto& red8 = std::get<std::vector<uint8_t>>(srcImage.redChannel);
+        const auto& green8 = std::get<std::vector<uint8_t>>(srcImage.greenChannel);
+        const auto& blue8 = std::get<std::vector<uint8_t>>(srcImage.blueChannel);
+
+        ImageSOA const srcImage16 = {
+            .redChannel = convertTo16Bit(red8),
+            .greenChannel = convertTo16Bit(green8),
+            .blueChannel = convertTo16Bit(blue8)
+        };
+        // Ejecutar la función para píxeles de 16 bits
+        return maxlevelSOAtype<uint16_t>(srcImage16, metadata, newMaxLevel, outputPath);
+    }
+    // Caso 4: Píxeles de 16-bit y nuevo nivel máximo de intensidad 8-bit
+    if (is16Bit(srcImage) && newMaxLevel <= MAX_COLOR_VALUE) {
+        auto [redChannel, greenChannel, blueChannel] = maxlevelSOAtype<uint16_t>(srcImage, metadata, newMaxLevel, outputPath);
+        ImageSOA srcImage8 = {
+            .redChannel = convertTo8Bit(std::get<std::vector<uint16_t>>(redChannel)),
+            .greenChannel = convertTo8Bit(std::get<std::vector<uint16_t>>(greenChannel)),
+            .blueChannel = convertTo8Bit(std::get<std::vector<uint16_t>>(blueChannel))
+        };
+        return srcImage8;
     }
     throw std::runtime_error("Error: Formato de píxeles no compatible\n");
 }
