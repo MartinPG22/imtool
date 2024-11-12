@@ -17,15 +17,21 @@
  * @param metadata Metadata of the image.
  * @param newMaxLevel The new maximum level of the pixels.
  * @param outputPath The path where the image with the new maximum level will be saved.
- * @return int 0 if the image was saved successfully, 1 if there was an error opening the file or
- *             if the pixel format is not supported.
+ * @return ImageAOS The image with the new maximum level.
  * @throws std::runtime_error If the output file cannot be opened or if the pixel format is not supported.
  */
-int maxlevelAOS(const ImageAOS& srcImage, const PPMMetadata& metadata, const int newMaxLevel, const std::string& outputPath) {
+ImageAOS maxlevelAOS(const ImageAOS &srcImage, const PPMMetadata &metadata, const int newMaxLevel,
+                     const std::string &outputPath) {
+    if (newMaxLevel <= 0) {
+        throw std::runtime_error("Invalid max level");
+    }
     ImageAOS max_level_AOS;
     // Cambiar el nivel máximo de los píxeles
     if (std::holds_alternative<std::vector<Pixel8>>(srcImage.pixels)) {
         const auto& srcPixels = std::get<std::vector<Pixel8>>(srcImage.pixels);
+        if (metadata.width * metadata.height != srcPixels.size()) {
+            throw std::runtime_error("Invalid number of pixels");
+        }
         std::vector<Pixel8> out_pixels(srcPixels.size());
         for (size_t index = 0; index < srcPixels.size(); ++index) {
             const auto& [r, g, b] = srcPixels[index];
@@ -49,5 +55,5 @@ int maxlevelAOS(const ImageAOS& srcImage, const PPMMetadata& metadata, const int
     }
     // Guardar la imagen con el nuevo nivel máximo
     saveAOStoPPM(max_level_AOS, metadata, newMaxLevel, outputPath);
-    return 0;
+    return max_level_AOS;
 }

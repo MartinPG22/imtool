@@ -25,7 +25,6 @@ int maxlevelSOA(const ImageSOA& srcImage, const PPMMetadata& metadata, const int
     const auto& blue = std::get<std::vector<uint8_t>>(srcImage.blueChannel);
     if (red.size() != green.size() || red.size() != blue.size()) {
         std::cerr << "Error: Los canales de color no tienen el mismo tamaño\n";
-        return 1;
     }
     std::cout << "Cambiando el nivel máximo de intensidad de la imagen a " << newMaxLevel << '\n';
     // Convertir los valores de los píxeles

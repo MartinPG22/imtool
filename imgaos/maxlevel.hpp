@@ -12,6 +12,7 @@
 
 #include "imageaos.hpp"
 
-int maxlevelAOS(const ImageAOS& srcImage,const PPMMetadata& metadata, int newMaxLevel, const std::string& outputPath);
+ImageAOS maxlevelAOS(const ImageAOS &srcImage, const PPMMetadata &metadata, int newMaxLevel,
+                     const std::string &outputPath);
 
 #endif //MAXLEVEL_AOS_HPP
