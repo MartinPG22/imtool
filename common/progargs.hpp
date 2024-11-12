@@ -21,7 +21,6 @@
 
 #include "../imgsoa/imagesoa.hpp"
 #include "../imgsoa/maxlevel.hpp"
-//#include "../imgsoa/resize.hpp"
 #include "../imgsoa/cutfreq.hpp"
 #include "../imgsoa/compress.hpp"
 #include "../imgsoa/resize.hpp"

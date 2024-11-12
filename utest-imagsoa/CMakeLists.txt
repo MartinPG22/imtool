@@ -3,6 +3,7 @@ add_executable(utest-imgsoa
         utest_resize_soa.cpp
         utest_maxlevel_soa.cpp
         utest_imagesoa.cpp
+        utest_cutfreq_soa.cpp
 
 )
 

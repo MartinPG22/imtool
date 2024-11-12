@@ -14,10 +14,7 @@
 #include "cutfreq.hpp"
 
 
-// Combina los valores RGB en una única clave entera
-constexpr int combineRGB(int red, int green, int blue) {
-    return (red << changeBits16) | (green << BYTE_SIZE) | blue;
-}
+
 
 // Contar frecuencia de cada color en la imagen SOA
 void countColorFrequency(const ImageSOA& srcImage,
