@@ -9,6 +9,6 @@
 
 #include "imagesoa.hpp"
 
-int maxlevelSOA(const ImageSOA& srcImage, const PPMMetadata& metadata, int newMaxLevel, const std::string& outputPath);
+ImageSOA maxlevelSOA(const ImageSOA& srcImage, const PPMMetadata& metadata, int newMaxLevel, const std::string& outputPath);
 
 #endif //MAXLEVEL_SOA_HPP
