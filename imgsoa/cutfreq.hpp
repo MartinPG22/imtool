@@ -21,7 +21,10 @@ void countColorFrequency(const ImageSOA& srcImage, std::unordered_map<int, int>&
 void applyColorReplacement(ImageSOA& srcImage, const std::unordered_map<int, std::tuple<int, int, int>>& replacementMap);
 void cutfreqSOA(ImageSOA& srcImage, const PPMMetadata& metadata, int nColores, const std::string& outputPath);
 void saveImageSOAToPPM(const ImageSOA& image, const PPMMetadata& metadata, const std::string& outputPath);
-constexpr int combineRGB(int red, int green, int blue);
+// Combina los valores RGB en una única clave entera
+constexpr int combineRGB(int red, int green, int blue) {
+  return (red << changeBits16) | (green << BYTE_SIZE) | blue;
+}
 std::vector<std::tuple<int, int, int, int>> getColorData(const std::unordered_map<int, int>& colorFrequency);
 std::tuple<int, int, int> findClosestReplacement(const std::tuple<int, int, int>& targetColor,
                                                  const std::vector<std::tuple<int, int, int, int>>& colorData,

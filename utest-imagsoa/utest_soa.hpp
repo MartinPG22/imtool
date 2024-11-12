@@ -14,8 +14,12 @@
 #include "imgsoa/imagesoa.hpp"
 #include "./common/binaryio.hpp"
 #include <filesystem>
+#include "./imgsoa/imagesoa.hpp"
+
+constexpr int n_3 = 5;
 constexpr int n_5 = 5;
 constexpr int n_9 = 9;
+constexpr int n_10 = 10;
 constexpr int n_32 = 32;
 constexpr int n_64 = 64;
 constexpr int n_65 = 65;
@@ -24,6 +28,7 @@ constexpr int n_67 = 67;
 constexpr int n_68 = 68;
 constexpr int n_69 = 69;
 constexpr int n_128 = 128;
+constexpr int n_254 = 254;
 constexpr int n_255 = 255;
 constexpr int n_300 = 300;
 constexpr int n_400 = 400;
