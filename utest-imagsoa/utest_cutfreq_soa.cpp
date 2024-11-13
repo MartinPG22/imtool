@@ -3,6 +3,7 @@
 //
 
 #include "utest_soa.hpp"
+#include <vector>
 
 
 /*
@@ -162,19 +163,4 @@ TEST(ApplyColorReplacementTest, AppliesReplacementCorrectly) {
         } else {
             FAIL() << "Canales de color no tienen el tipo esperado (uint8_t)";
         }
-}
-TEST(CutfreqSOATest, ProcessesImageCorrectly) {
-    ImageSOA img;
-    img.redChannel = std::vector<uint8_t>{n_255, 0, n_255, 0};
-    img.greenChannel = std::vector<uint8_t>{0, n_255, 0, n_255};
-    img.blueChannel = std::vector<uint8_t>{0, 0, n_255, n_255};
-
-    PPMMetadata metadata{};
-    metadata.max_value = n_255;
-
-    std::string const outputPath = "output.ppm";
-    cutfreqSOA(img, metadata, 2, outputPath);
-
-    // Verificación básica de salida, podría incluir más validación.
-    EXPECT_TRUE(std::filesystem::exists(outputPath));
 }

@@ -4,6 +4,7 @@ add_executable(utest-imgaos
         utest_aos.hpp
         utest_compress_aos.cpp
         utest_maxlevel_aos.cpp
+        utest_imageaos.cpp
 )
 
 # Vincular Google Test

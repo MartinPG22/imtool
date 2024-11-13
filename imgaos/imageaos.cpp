@@ -19,6 +19,7 @@ ImageAOS cargarPixels8(std::ifstream& archivo, const size_t num_pixels) {
     std::vector<Pixel8> pixels8(num_pixels);
 
     std::array<char, buffer_size_8> buffer{};
+    size_t count = 0;
     for (auto&[r, g, b] : pixels8) {
         if (!archivo.read(buffer.data(), buffer_size_8)) {
             std::cerr << "Error: Falló la lectura de píxeles." << '\n';
@@ -27,7 +28,10 @@ ImageAOS cargarPixels8(std::ifstream& archivo, const size_t num_pixels) {
         r = static_cast<uint8_t>(buffer[0]);
         g = static_cast<uint8_t>(buffer[1]);
         b = static_cast<uint8_t>(buffer[2]);
+        count++;
     }
+
+    std::cerr << "Se leyeron " << count << " píxeles." << '\n';
     imagen.pixels = std::move(pixels8);
     return imagen;
 }
@@ -59,9 +63,9 @@ ImageAOS cargarPixels16(std::ifstream& archivo, const size_t num_pixels) {
         uint16_t const blue1 = static_cast<uint8_t>(buffer[4]);
         uint16_t const blue2 = static_cast<uint8_t>(buffer[5]);
         // Realizar las combinaciones usando suma
-        r = static_cast<uint16_t>(red1 + (red2 << changeBits));
-        g = static_cast<uint16_t>(green1 + (green2 << changeBits));
-        b = static_cast<uint16_t>(blue1 + (blue2 << changeBits));
+        r = static_cast<uint16_t>(red1 | (red2 << changeBits));
+        g = static_cast<uint16_t>(green1 | (green2 << changeBits));
+        b = static_cast<uint16_t>(blue1 | (blue2 << changeBits));
     }
     imagen.pixels = std::move(pixels16);
     return imagen;
