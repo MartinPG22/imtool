@@ -1,0 +1,432 @@
+Prueba de argumentos insuficientes
+Error: Invalid number of arguments: 0
+Error: Invalid number of arguments: 1
+Error: Invalid number of arguments: 2
+
+Prueba de operación inválida
+Error: Invalid operation: invalid_op
+
+PRUEBA DE OPERACIÓN INFO
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/deer-small-output-aos.ppm
+Operation: info
+Image size: 200x267
+Max level: 255
+---------------------------------------------------------------------------------------
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/lake-large-output-aos.ppm
+Operation: info
+Image size: 3000x4000
+Max level: 255
+---------------------------------------------------------------------------------------
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/lake-small-output-aos.ppm
+Operation: info
+Image size: 100x133
+Max level: 255
+---------------------------------------------------------------------------------------
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/sabatini-output-aos.ppm
+Operation: info
+Image size: 1320x1980
+Max level: 255
+---------------------------------------------------------------------------------------
+
+PRUEBA DE OPERACIÓN MAXLEVEL
+Se leyeron 53400 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/deer-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Se leyeron 12000000 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/lake-large-output-aos.ppm
+---------------------------------------------------------------------------------------
+Se leyeron 13300 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Se leyeron 13300 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/lake-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Se leyeron 2613600 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Se leyeron 2613600 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/sabatini-output-aos.ppm
+---------------------------------------------------------------------------------------
+Maxlevel con valor negativo
+Se leyeron 53400 píxeles.
+Error: Invalid maxlevel: -1
+---------------------------------------------------------------------------------------
+Maxlevel con valor no numérico
+Se leyeron 53400 píxeles.
+Error: Invalid maxlevel: 70000
+---------------------------------------------------------------------------------------
+Maxlevel con valor no numérico
+Se leyeron 53400 píxeles.
+Error: Invalid maxlevel: copy
+---------------------------------------------------------------------------------------
+
+PRUEBA DE OPERACIÓN RESIZE
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/deer-small-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/deer-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-large-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-large-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Se leyeron 13300 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-small-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Se leyeron 2613600 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/sabatini-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/sabatini-output-aos.ppm
+---------------------------------------------------------------------------------------
+Resize con valor negativo
+Error: Invalid resize width: -100
+---------------------------------------------------------------------------------------
+Resize con valor no numérico
+Error: Invalid resize height: -200
+---------------------------------------------------------------------------------------
+Resize con valor no numérico
+Error: Invalid resize height: max
+---------------------------------------------------------------------------------------
+
+PRUEBA DE OPERACIÓN CUTFREQ
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+No se pudo abrir el archivo de salida
+---------------------------------------------------------------------------------------
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+No se pudo abrir el archivo de salida
+---------------------------------------------------------------------------------------
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Se leyeron 13300 píxeles.
+No se pudo abrir el archivo de salida
+---------------------------------------------------------------------------------------
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Se leyeron 2613600 píxeles.
+No se pudo abrir el archivo de salida
+---------------------------------------------------------------------------------------
+Cutfreq con valor negativo
+Error: Invalid cutfreq: -1
+---------------------------------------------------------------------------------------
+Cutfreq con valor no numérico
+Error: Invalid cutfreq: copy
+
+PRUEBA DE OPERACIÓN COMPRESS
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+Archivo /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/compress_output/deer-small-output-aos.ppm generado correctamente en formato CPPM.
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+Prueba de argumentos insuficientes
+Error: Invalid number of arguments: 0
+Error: Invalid number of arguments: 1
+Error: Invalid number of arguments: 2
+
+Prueba de operación inválida
+Error: Invalid operation: invalid_op
+
+PRUEBA DE OPERACIÓN INFO
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/deer-small-output-aos.ppm
+Operation: info
+Image size: 200x267
+Max level: 255
+---------------------------------------------------------------------------------------
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/lake-large-output-aos.ppm
+Operation: info
+Image size: 3000x4000
+Max level: 255
+---------------------------------------------------------------------------------------
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/lake-small-output-aos.ppm
+Operation: info
+Image size: 100x133
+Max level: 255
+---------------------------------------------------------------------------------------
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/sabatini-output-aos.ppm
+Operation: info
+Image size: 1320x1980
+Max level: 255
+---------------------------------------------------------------------------------------
+
+PRUEBA DE OPERACIÓN MAXLEVEL
+Se leyeron 53400 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/deer-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Se leyeron 12000000 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/lake-large-output-aos.ppm
+---------------------------------------------------------------------------------------
+Se leyeron 13300 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Se leyeron 13300 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/lake-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Se leyeron 2613600 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Se leyeron 2613600 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/sabatini-output-aos.ppm
+---------------------------------------------------------------------------------------
+Maxlevel con valor negativo
+Se leyeron 53400 píxeles.
+Error: Invalid maxlevel: -1
+---------------------------------------------------------------------------------------
+Maxlevel con valor no numérico
+Se leyeron 53400 píxeles.
+Error: Invalid maxlevel: 70000
+---------------------------------------------------------------------------------------
+Maxlevel con valor no numérico
+Se leyeron 53400 píxeles.
+Error: Invalid maxlevel: copy
+---------------------------------------------------------------------------------------
+
+PRUEBA DE OPERACIÓN RESIZE
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/deer-small-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/deer-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-large-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-large-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Se leyeron 13300 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-small-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Se leyeron 2613600 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/sabatini-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/sabatini-output-aos.ppm
+---------------------------------------------------------------------------------------
+Resize con valor negativo
+Error: Invalid resize width: -100
+---------------------------------------------------------------------------------------
+Resize con valor no numérico
+Error: Invalid resize height: -200
+---------------------------------------------------------------------------------------
+Resize con valor no numérico
+Error: Invalid resize height: max
+---------------------------------------------------------------------------------------
+
+PRUEBA DE OPERACIÓN CUTFREQ
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/cutfreq_output/deer-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/cutfreq_output/lake-large-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Se leyeron 13300 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/cutfreq_output/lake-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Se leyeron 2613600 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/cutfreq_output/sabatini-output-aos.ppm
+---------------------------------------------------------------------------------------
+Cutfreq con valor negativo
+Error: Invalid cutfreq: -1
+---------------------------------------------------------------------------------------
+Cutfreq con valor no numérico
+Error: Invalid cutfreq: copy
+
+PRUEBA DE OPERACIÓN COMPRESS
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+Archivo /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/compress_output/deer-small-output-aos.ppm generado correctamente en formato CPPM.
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+Archivo /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/compress_output/lake-large-output-aos.ppm generado correctamente en formato CPPM.
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Se leyeron 13300 píxeles.
+Archivo /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/compress_output/lake-small-output-aos.ppm generado correctamente en formato CPPM.
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Se leyeron 2613600 píxeles.
+Archivo /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/compress_output/lake-large-output-aos.ppm generado correctamente en formato CPPM.
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Se leyeron 13300 píxeles.
+Archivo /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/compress_output/lake-small-output-aos.ppm generado correctamente en formato CPPM.
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Se leyeron 2613600 píxeles.
+Archivo /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/compress_output/sabatini-output-aos.ppm generado correctamente en formato CPPM.
+---------------------------------------------------------------------------------------
+Archivo /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/compress_output/sabatini-output-aos.ppm generado correctamente en formato CPPM.
+---------------------------------------------------------------------------------------
+
+PRUEBA DE ARGUMENTOS INSUFICIENTES
+Error: Invalid number of arguments: 0
+Error: Invalid number of arguments: 1
+Error: Invalid number of arguments: 2
+
+PRUEBA DE OPERACIÓN INVÁLIDA
+Error: Invalid operation: invalid_op
+
+PRUEBA DE OPERACIÓN INFO
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/deer-small-output-aos.ppm
+Operation: info
+Image size: 200x267
+Max level: 255
+---------------------------------------------------------------------------------------
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/lake-large-output-aos.ppm
+Operation: info
+Image size: 3000x4000
+Max level: 255
+---------------------------------------------------------------------------------------
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/lake-small-output-aos.ppm
+Operation: info
+Image size: 100x133
+Max level: 255
+---------------------------------------------------------------------------------------
+Executing 'info' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Input: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Out: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/info_output/sabatini-output-aos.ppm
+Operation: info
+Image size: 1320x1980
+Max level: 255
+---------------------------------------------------------------------------------------
+
+PRUEBA DE OPERACIÓN MAXLEVEL
+Se leyeron 53400 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/deer-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Se leyeron 12000000 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/lake-large-output-aos.ppm
+---------------------------------------------------------------------------------------
+Se leyeron 13300 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Se leyeron 13300 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/lake-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Se leyeron 2613600 píxeles.
+Executing 'maxlevel' operation with level on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Se leyeron 2613600 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/maxlevel_output/sabatini-output-aos.ppm
+---------------------------------------------------------------------------------------
+Maxlevel con argumentos extra
+Se leyeron 53400 píxeles.
+Error: Invalid number of extra arguments for maxlevel: 2
+Se leyeron 53400 píxeles.
+Error: Invalid number of extra arguments for maxlevel: 0
+---------------------------------------------------------------------------------------
+Maxlevel con valor negativo
+Se leyeron 53400 píxeles.
+Error: Invalid maxlevel: -1
+---------------------------------------------------------------------------------------
+Maxlevel con valor no numérico
+Se leyeron 53400 píxeles.
+Error: Invalid maxlevel: 70000
+---------------------------------------------------------------------------------------
+Maxlevel con valor no numérico
+Se leyeron 53400 píxeles.
+Error: Invalid maxlevel: copy
+---------------------------------------------------------------------------------------
+
+PRUEBA DE OPERACIÓN RESIZE
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/deer-small-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/deer-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-large-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-large-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Se leyeron 13300 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-small-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/lake-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'resize' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Se leyeron 2613600 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/sabatini-output-aos.ppm
+La imagen con el nuevo tamaño se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/resize_output/sabatini-output-aos.ppm
+---------------------------------------------------------------------------------------
+Resize con argumentos extra
+Error: Invalid number of extra arguments for resize: 3
+Error: Invalid number of extra arguments for resize: 1
+Error: Invalid number of extra arguments for resize: 0
+---------------------------------------------------------------------------------------
+Resize con valor negativo
+Error: Invalid resize width: -100
+Error: Invalid resize height: -200
+---------------------------------------------------------------------------------------
+Resize con valor no numérico
+Error: Invalid resize height: max
+---------------------------------------------------------------------------------------
+
+PRUEBA DE OPERACIÓN CUTFREQ
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/cutfreq_output/deer-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/cutfreq_output/lake-large-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-small.ppm
+Se leyeron 13300 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/cutfreq_output/lake-small-output-aos.ppm
+---------------------------------------------------------------------------------------
+Executing 'cutfreq' operation with number of colors: 5 on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/sabatini.ppm
+Se leyeron 2613600 píxeles.
+La imagen con el nuevo nivel máximo de intensidad se ha guardado en /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/cutfreq_output/sabatini-output-aos.ppm
+---------------------------------------------------------------------------------------
+Cutfreq con argumentos extra
+Error: Invalid number of extra arguments for cutfreq: 2
+Error: Invalid number of extra arguments for cutfreq: 0
+Cutfreq con valor negativo
+Error: Invalid cutfreq: -1
+---------------------------------------------------------------------------------------
+Cutfreq con valor no numérico
+Error: Invalid cutfreq: copy
+
+PRUEBA DE OPERACIÓN COMPRESS
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+Archivo /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/compress_output/deer-small-output-aos.ppm generado correctamente en formato CPPM.
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
+Archivo /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/compress_output/lake-large-output-aos.ppm generado correctamente en formato CPPM.
+/home/asanch/arcos/PracticaArcos/ftest-aos/ftest-imtool-aos.sh: line 107: e: command not found
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/deer-small.ppm
+Se leyeron 53400 píxeles.
+Archivo /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/compress_output/deer-small-output-aos.ppm generado correctamente en formato CPPM.
+Executing 'compress' operation on: /home/asanch/arcos/PracticaArcos/ftest-aos/../imagesPPM/input/lake-large.ppm
+Se leyeron 12000000 píxeles.
