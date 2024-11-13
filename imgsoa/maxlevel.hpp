@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <algorithm>
-
+#include<tuple>
 #include "imagesoa.hpp"
 
 ImageSOA maxlevelSOA(const ImageSOA& srcImage, const PPMMetadata& metadata, int newMaxLevel, const std::string& outputPath);
