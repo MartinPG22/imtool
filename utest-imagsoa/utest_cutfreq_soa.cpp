@@ -3,6 +3,7 @@
 //
 
 #include "utest_soa.hpp"
+#include <vector>
 
 
 /*

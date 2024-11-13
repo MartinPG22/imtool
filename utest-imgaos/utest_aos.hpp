@@ -6,7 +6,6 @@
 #define UTEST_AOS_HPP
 
 #include <gtest/gtest.h>
-// #include <gmock/gmock.h>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -18,8 +17,12 @@
 
 constexpr int n_5 = 5;
 constexpr int n_32 = 32;
+constexpr int n_50 = 50;
 constexpr int n_64 = 64;
+constexpr int n_100 = 100;
 constexpr int n_128 = 128;
+constexpr int n_150 = 150;
+constexpr int n_200 = 200;
 constexpr int n_255 = 255;
 constexpr int n_300 = 300;
 constexpr int n_400 = 400;
@@ -29,6 +32,7 @@ constexpr int n_15000 = 15000;
 constexpr int n_30000 = 30000;
 constexpr int n_65534 = 65534;
 constexpr int n_65535 = 65535;
+constexpr int n_0xFF = 0xFF;
 
 constexpr uint8_t u_0 = 0;
 constexpr uint8_t u_25 = 25;
@@ -48,6 +52,20 @@ constexpr uint16_t u_15000 = 15000;
 constexpr uint16_t u_16448 = 16448;
 constexpr uint16_t u_32896 = 32896;
 
+// Valores constantes para pruebas
+constexpr size_t kWidth = 2;
+constexpr size_t kHeight = 2;
+constexpr uint8_t kMaxValue8 = 255;
+constexpr uint16_t kMaxValue16 = 65535;
+
+
 template <typename T>
 bool colorsAreEqual(const Color<T>& color1, const Color<T>& color2);
+void crearPPM8Bit(const std::string& filename);
+void crearPPM16Bit(const std::string& filename);
+std::string getFileName8();
+std::string getFileName16();
+std::string getOutputPath();
+void SetUpTestFiles();
+void TearDownTestFiles();
 #endif //UTEST_AOS_HPP
