@@ -5,6 +5,45 @@
 #include "maxlevel.hpp"
 
 
+namespace {
+    // Transformar imagen de 16-bit a 16-bit
+    std::vector<Pixel16> convert16To16(const ImageAOS &srcImage,  const PPMMetadata& metadata, const int newMaxLevel) {
+        const auto& srcPixels = std::get<std::vector<Pixel16>>(srcImage.pixels);
+        std::vector<Pixel16> out_pixels(srcPixels.size());
+        for (size_t index = 0; index < srcPixels.size(); ++index) {
+            const auto& [r, g, b] = srcPixels[index];
+            out_pixels[index].r = static_cast<uint16_t>(r * newMaxLevel / metadata.max_value);
+            out_pixels[index].g = static_cast<uint16_t>(g * newMaxLevel / metadata.max_value);
+            out_pixels[index].b = static_cast<uint16_t>(b * newMaxLevel / metadata.max_value);
+        }
+        return out_pixels;
+    }
+    // Convierte una imagen de 8-bit a 16-bit
+    std::vector<Pixel8> convert8To16(const ImageAOS &srcImage,  const PPMMetadata& metadata, const int newMaxLevel) {
+        const auto& srcPixels = std::get<std::vector<Pixel16>>(srcImage.pixels);
+        std::vector<Pixel8> out_pixels(srcPixels.size());
+        for (size_t index = 0; index < srcPixels.size(); ++index) {
+            const auto& [r, g, b] = srcPixels[index];
+            out_pixels[index].r = static_cast<uint8_t>(r * newMaxLevel / metadata.max_value);
+            out_pixels[index].g = static_cast<uint8_t>(g * newMaxLevel / metadata.max_value);
+            out_pixels[index].b = static_cast<uint8_t>(b * newMaxLevel / metadata.max_value);
+        }
+        return out_pixels;
+    }
+    // Convierte una imagen de 16-bit a 8-bit
+    std::vector<Pixel16> convert16To8(const ImageAOS &srcImage,  const PPMMetadata& metadata, const int newMaxLevel) {
+        const auto& srcPixels = std::get<std::vector<Pixel8>>(srcImage.pixels);
+        std::vector<Pixel16> out_pixels(srcPixels.size());
+        for (size_t index = 0; index < srcPixels.size(); ++index) {
+            const auto& [r, g, b] = srcPixels[index];
+            out_pixels[index].r = static_cast<uint16_t>(r * newMaxLevel / metadata.max_value);
+            out_pixels[index].g = static_cast<uint16_t>(g * newMaxLevel / metadata.max_value);
+            out_pixels[index].b = static_cast<uint16_t>(b * newMaxLevel / metadata.max_value);
+        }
+        return out_pixels;
+    }
+}
+
 /**
  * @brief Changes the maximum pixel level of an image in AOS format and saves it in PPM.
  *
@@ -42,37 +81,13 @@ ImageAOS maxlevelAOS(const ImageAOS &srcImage, const PPMMetadata &metadata, cons
         max_level_AOS.pixels = std::move(out_pixels);
     // Caso 2: Píxeles de 16-bit y nuevo nivel máximo de intensidad 16-bit
     } else if (std::holds_alternative<std::vector<Pixel16>>(srcImage.pixels) && newMaxLevel > MAX_COLOR_VALUE) {
-        const auto& srcPixels = std::get<std::vector<Pixel16>>(srcImage.pixels);
-        std::vector<Pixel16> out_pixels(srcPixels.size());
-        for (size_t index = 0; index < srcPixels.size(); ++index) {
-            const auto& [r, g, b] = srcPixels[index];
-            out_pixels[index].r = static_cast<uint16_t>(r * newMaxLevel / metadata.max_value);
-            out_pixels[index].g = static_cast<uint16_t>(g * newMaxLevel / metadata.max_value);
-            out_pixels[index].b = static_cast<uint16_t>(b * newMaxLevel / metadata.max_value);
-        }
-        max_level_AOS.pixels = std::move(out_pixels);
+        max_level_AOS.pixels = convert16To16(srcImage, metadata, newMaxLevel);
     // Caso 3: Píxeles de 8-bit y nuevo nivel máximo de intensidad 16-bit
     } else if (std::holds_alternative<std::vector<Pixel8>>(srcImage.pixels) && newMaxLevel > MAX_COLOR_VALUE) {
-        const auto& srcPixels = std::get<std::vector<Pixel8>>(srcImage.pixels);
-        std::vector<Pixel16> out_pixels(srcPixels.size());
-        for (size_t index = 0; index < srcPixels.size(); ++index) {
-            const auto& [r, g, b] = srcPixels[index];
-            out_pixels[index].r = static_cast<uint16_t>(r * newMaxLevel / metadata.max_value);
-            out_pixels[index].g = static_cast<uint16_t>(g * newMaxLevel / metadata.max_value);
-            out_pixels[index].b = static_cast<uint16_t>(b * newMaxLevel / metadata.max_value);
-        }
-        max_level_AOS.pixels = std::move(out_pixels);
+        max_level_AOS.pixels = convert16To8(srcImage, metadata, newMaxLevel);
     // Caso 4: Píxeles de 16-bit y nuevo nivel máximo de intensidad 8-bit
     } else if (std::holds_alternative<std::vector<Pixel16>>(srcImage.pixels) && newMaxLevel <= MAX_COLOR_VALUE) {
-        const auto& srcPixels = std::get<std::vector<Pixel16>>(srcImage.pixels);
-        std::vector<Pixel8> out_pixels(srcPixels.size());
-        for (size_t index = 0; index < srcPixels.size(); ++index) {
-            const auto& [r, g, b] = srcPixels[index];
-            out_pixels[index].r = static_cast<uint8_t>(r * newMaxLevel / metadata.max_value);
-            out_pixels[index].g = static_cast<uint8_t>(g * newMaxLevel / metadata.max_value);
-            out_pixels[index].b = static_cast<uint8_t>(b * newMaxLevel / metadata.max_value);
-        }
-        max_level_AOS.pixels = std::move(out_pixels);
+        max_level_AOS.pixels = convert8To16(srcImage, metadata, newMaxLevel);
     } else {
         throw std::runtime_error("Unsupported pixel format");
     }

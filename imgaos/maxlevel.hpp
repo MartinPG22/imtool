@@ -9,6 +9,7 @@
 #include <fstream>
 #include <vector>
 #include <cstdint>
+#include <algorithm>
 
 #include "imageaos.hpp"
 
