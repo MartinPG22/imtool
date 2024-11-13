@@ -11,7 +11,7 @@ perf stat -e cpu-cycles,instructions,cache-references,cache-misses \
 echo "Medición de rendimiento finalizada"
 
 # Medir consumo de energía
-perf stat -e power/energy-cores/,power/energy-gpu/,power/energy-pkg/,power/energy-ram/ \
+perf stat -e power/energy-cores/,power/energy-pkg/,power/energy-ram/ \
     PracticaArcos2-release/imtool-aos/imtool-aos \
     PracticaArcos2/imagesPPM/lake-small.ppm \
     PracticaArcos2/imagesPPM/lake-small-aos-resize-8000.ppm \
@@ -29,7 +29,7 @@ perf stat -e cpu-cycles,instructions,cache-references,cache-misses \
 echo "Medición de rendimiento finalizada"
 
 # Medir consumo de energía
-perf stat -e power/energy-cores/,power/energy-gpu/,power/energy-pkg/,power/energy-ram/ \
+perf stat -e power/energy-cores/,power/energy-pkg/,power/energy-ram/ \
     PracticaArcos2-release/imtool-soa/imtool-soa \
     PracticaArcos2/imagesPPM/lake-small.ppm \
     PracticaArcos2/imagesPPM/lake-small-soa-resize-8000.ppm \
@@ -49,7 +49,7 @@ perf stat -e cpu-cycles,instructions,cache-references,cache-misses \
 echo "Medición de rendimiento finalizada"
 
 # Medir consumo de energía
-perf stat -e power/energy-cores/,power/energy-gpu/,power/energy-pkg/,power/energy-ram/ \
+perf stat -e power/energy-cores/,power/energy-pkg/,power/energy-ram/ \
     PracticaArcos2-release/imtool-aos/imtool-aos \
     PracticaArcos2/imagesPPM/lake-large.ppm \
     PracticaArcos2/imagesPPM/lake-large-aos-maxlevel-65535.ppm \
@@ -67,7 +67,7 @@ perf stat -e cpu-cycles,instructions,cache-references,cache-misses \
 echo "Medición de rendimiento finalizada"
 
 # Medir consumo de energía
-perf stat -e power/energy-cores/,power/energy-gpu/,power/energy-pkg/,power/energy-ram/ \
+perf stat -e power/energy-cores/,power/energy-pkg/,power/energy-ram/ \
     PracticaArcos2-release/imtool-soa/imtool-soa \
     PracticaArcos2/imagesPPM/lake-large.ppm \
     PracticaArcos2/imagesPPM/lake-large-soa-maxlevel-65535.ppm \
@@ -87,7 +87,7 @@ perf stat -e cpu-cycles,instructions,cache-references,cache-misses \
 echo "Medición de rendimiento finalizada"
 
 # Medir consumo de energía
-perf stat -e power/energy-cores/,power/energy-gpu/,power/energy-pkg/,power/energy-ram/ \
+perf stat -e power/energy-cores/,power/energy-pkg/,power/energy-ram/ \
     PracticaArcos2-release/imtool-aos/imtool-aos \
     PracticaArcos2/imagesPPM/lake-large.ppm \
     PracticaArcos2/imagesPPM/lake-large-aos-cutfreq-100k.ppm \
@@ -105,7 +105,7 @@ perf stat -e cpu-cycles,instructions,cache-references,cache-misses \
 echo "Medición de rendimiento finalizada"
 
 # Medir consumo de energía
-perf stat -e power/energy-cores/,power/energy-gpu/,power/energy-pkg/,power/energy-ram/ \
+perf stat -e power/energy-cores/,power/energy-pkg/,power/energy-ram/ \
     PracticaArcos2-release/imtool-soa/imtool-soa \
     PracticaArcos2/imagesPPM/lake-large.ppm \
     PracticaArcos2/imagesPPM/lake-large-soa-cutfreq-100k.ppm \
@@ -125,7 +125,7 @@ perf stat -e cpu-cycles,instructions,cache-references,cache-misses \
 echo "Medición de rendimiento finalizada"
 
 # Medir consumo de energía
-perf stat -e power/energy-cores/,power/energy-gpu/,power/energy-pkg/,power/energy-ram/ \
+perf stat -e power/energy-cores/,power/energy-pkg/,power/energy-ram/ \
     PracticaArcos2-release/imtool-aos/imtool-aos \
     PracticaArcos2/imagesPPM/lake-small.ppm \
     PracticaArcos2/imagesPPM/lake-small-aos-compress.cppm \
@@ -143,7 +143,7 @@ perf stat -e cpu-cycles,instructions,cache-references,cache-misses \
 echo "Medición de rendimiento finalizada"
 
 # Medir consumo de energía
-perf stat -e power/energy-cores/,power/energy-gpu/,power/energy-pkg/,power/energy-ram/ \
+perf stat -e power/energy-cores/,power/energy-pkg/,power/energy-ram/ \
     PracticaArcos2-release/imtool-soa/imtool-soa \
     PracticaArcos2/imagesPPM/lake-small.ppm \
     PracticaArcos2/imagesPPM/lake-small-soa-compress.cppm \
