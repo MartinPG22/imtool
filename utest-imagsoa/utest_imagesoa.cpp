@@ -133,7 +133,7 @@ TEST(CargarImagenPPMtoSOATest, RGBChannelsCorrect8) {
     archivo << "\xFF\x01\x01\x01\xFF\x01\x01\x01\x01\xFF\x01\x01\x01\x01\xFF\xFF\xFF\xFF";
     archivo.close();
 
-    PPMMetadata metadata{};
+    PPMMetadata metadata{.width = 6, .height = 1, .max_value = 255};
     ImageSOA const imagen = cargarImagenPPMtoSOA("archivo.ppm", metadata);
 
     // Verificar que los valores en los canales sean correctos
@@ -172,7 +172,7 @@ TEST(CargarImagenPPMtoSOATest, RGBChannelsCorrect16) {
     }
     archivo.close();
 
-    PPMMetadata metadata{};
+    PPMMetadata metadata{.width = 2, .height = 4, .max_value = 65535};
     ImageSOA const imagen = cargarImagenPPMtoSOA("archivo.ppm", metadata);
 
     // Verificar que los valores en los canales sean correctos

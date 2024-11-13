@@ -169,7 +169,7 @@ TEST(CutfreqSOATest, ProcessesImageCorrectly) {
     img.greenChannel = std::vector<uint8_t>{0, n_255, 0, n_255};
     img.blueChannel = std::vector<uint8_t>{0, 0, n_255, n_255};
 
-    PPMMetadata metadata{};
+    PPMMetadata metadata{.width = 2, .height = 2, .max_value = 255};
     metadata.max_value = n_255;
 
     std::string const outputPath = "output.ppm";

@@ -105,8 +105,11 @@ namespace {
         std::vector<uint8_t> blue;
     };
     // Helper function to write 8-bit pixel data
-    void writePixelData8(std::ofstream& outFile, const ColorChannels8& channels) {
+    void writePixelData8(std::ofstream& outFile, const ColorChannels8& channels, const int maxLevel) {
         for (size_t i = 0; i < channels.red.size(); ++i) {
+            if (channels.red[i] > maxLevel || channels.green[i] > maxLevel || channels.blue[i] > maxLevel) {
+                throw std::runtime_error("Valor de píxel inválido");
+            }
             outFile.put(static_cast<char>(channels.red[i]));
             outFile.put(static_cast<char>(channels.green[i]));
             outFile.put(static_cast<char>(channels.blue[i]));
@@ -118,8 +121,11 @@ namespace {
         std::vector<uint16_t> blue;
     };
     // Helper function to write 16-bit pixel data
-    void writePixelData16(std::ofstream& outFile, const ColorChannels16& channels) {
+    void writePixelData16(std::ofstream& outFile, const ColorChannels16& channels, const int maxLevel) {
         for (size_t i = 0; i < channels.red.size(); ++i) {
+            if (channels.red[i] > maxLevel || channels.green[i] > maxLevel || channels.blue[i] > maxLevel) {
+                throw std::runtime_error("Valor de píxel inválido");
+            }
             outFile.put(static_cast<char>(channels.red[i]));
             outFile.put(static_cast<char>(channels.green[i]));
             outFile.put(static_cast<char>(channels.blue[i]));
@@ -140,7 +146,7 @@ namespace {
  */
 ImageSOA cargarImagenPPMtoSOA(const std::string& nombre_archivo, PPMMetadata& metadata) {
     std::ifstream archivo(nombre_archivo, std::ios::binary);
-    if (!archivo) {
+    if (!archivo || metadata.width == 0 || metadata.height == 0) {
         throw std::runtime_error("No se pudo abrir el archivo");
     }
     // Leer el tipo de magia
@@ -196,6 +202,9 @@ int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, const in
     if (!outFile.is_open() || outputPath.substr(outputPath.size() - 4) != ".ppm") {
         throw std::runtime_error("No se pudo abrir el archivo");
     }
+    if (maxLevel < 0 || maxLevel > MAX_COLOR_VALUE_16) {
+        throw std::runtime_error("Nivel máximo de intensidad no soportado");
+    }
     // Check channel sizes
     if (std::holds_alternative<std::vector<uint8_t>>(srcImage.redChannel)) {
         auto redChannel = std::get<std::vector<uint8_t>>(srcImage.redChannel);
@@ -205,12 +214,9 @@ int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, const in
         if (redChannel.size() != greenChannel.size() || greenChannel.size() != blueChannel.size() || metadata.width * metadata.height != redChannel.size()) {
             throw std::runtime_error("Los tamaños de los canales no coinciden");
         }
-        if (maxLevel > METATADATA_MAX_VALUE || maxLevel < 0) {
-            throw std::runtime_error("Nivel máximo de intensidad no soportado");
-        }
         writePPMHeader(outFile, metadata, maxLevel);
         ColorChannels8 const channels8{.red=redChannel, .green=greenChannel, .blue=blueChannel};
-        writePixelData8(outFile, channels8);
+        writePixelData8(outFile, channels8, maxLevel);
     } else if (std::holds_alternative<std::vector<uint16_t>>(srcImage.redChannel)) {
         auto redChannel = std::get<std::vector<uint16_t>>(srcImage.redChannel);
         auto greenChannel = std::get<std::vector<uint16_t>>(srcImage.greenChannel);
@@ -219,12 +225,9 @@ int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, const in
         if (redChannel.size() != greenChannel.size() || greenChannel.size() != blueChannel.size() || metadata.width * metadata.height != redChannel.size()) {
             throw std::runtime_error("Los tamaños de los canales no coinciden");
         }
-        if (maxLevel > MAX_COLOR_VALUE_16 || maxLevel <= METATADATA_MAX_VALUE) {
-            throw std::runtime_error("Nivel máximo de intensidad no soportado");
-        }
         writePPMHeader(outFile, metadata, maxLevel);
         ColorChannels16 const channels16{.red=redChannel, .green=greenChannel, .blue=blueChannel};
-        writePixelData16(outFile, channels16);
+        writePixelData16(outFile, channels16, maxLevel);
     } else {
         throw std::runtime_error("Formato de píxeles no soportado");
     }
