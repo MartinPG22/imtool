@@ -40,6 +40,7 @@ constexpr int n_65534 = 65534;
 constexpr int n_65535 = 65535;
 
 constexpr uint8_t u_0 = 0;
+constexpr uint8_t u_1 = 1;
 constexpr uint8_t u_12 = 12;
 constexpr uint8_t u_25 = 25;
 constexpr uint8_t u_32 = 32;

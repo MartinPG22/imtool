@@ -14,8 +14,9 @@ namespace {
      * @param imagen The SOA image to store the channels.
      * @param num_pixels The number of pixels to read.
      * @param max_value The maximum intensity level.
+     * @throw std::runtime_error If the pixel value is invalid, the number of pixels is incorrect, or there are extra data in the file.
      */
-    void leerCanales8Bits(std::ifstream& archivo, ImageSOA& imagen, const size_t num_pixels, const int max_value) {
+    void leerCanales8Bits(std::ifstream& archivo, const size_t num_pixels, ImageSOA& imagen, const int max_value) {
         auto& red = std::get<std::vector<uint8_t>>(imagen.redChannel);
         auto& green = std::get<std::vector<uint8_t>>(imagen.greenChannel);
         auto& blue = std::get<std::vector<uint8_t>>(imagen.blueChannel);
@@ -51,8 +52,9 @@ namespace {
      * @param imagen The SOA image to store the channels.
      * @param num_pixels The number of pixels to read.
      * @param max_value The maximum intensity level.
+     * @throw std::runtime_error If the pixel value is invalid, the number of pixels is incorrect, or there are extra data in the file.
      */
-    void leerCanales16Bits(std::ifstream& archivo, ImageSOA& imagen, const size_t num_pixels, const int max_value) {
+    void leerCanales16Bits(std::ifstream& archivo, const size_t num_pixels, ImageSOA& imagen, const int max_value) {
         auto& red = std::get<std::vector<uint16_t>>(imagen.redChannel);
         auto& green = std::get<std::vector<uint16_t>>(imagen.greenChannel);
         auto& blue = std::get<std::vector<uint16_t>>(imagen.blueChannel);
@@ -134,7 +136,7 @@ namespace {
  * @param nombre_archivo The path to the PPM file.
  * @param metadata Metadata of the image.
  * @return ImageSOA The image in SOA format.
- * @throws std::runtime_error If the file cannot be opened or the format is not supported.
+ * @throws std::runtime_error If the file cannot be opened, the format is not supported, or the image dimensions are invalid.
  */
 ImageSOA cargarImagenPPMtoSOA(const std::string& nombre_archivo, PPMMetadata& metadata) {
     std::ifstream archivo(nombre_archivo, std::ios::binary);
@@ -167,13 +169,13 @@ ImageSOA cargarImagenPPMtoSOA(const std::string& nombre_archivo, PPMMetadata& me
         imagen.redChannel = std::vector<uint8_t>(num_pixels);
         imagen.greenChannel = std::vector<uint8_t>(num_pixels);
         imagen.blueChannel = std::vector<uint8_t>(num_pixels);
-        leerCanales8Bits(archivo, imagen, num_pixels, metadata.max_value);
+        leerCanales8Bits(archivo, num_pixels, imagen, metadata.max_value);
     } else {
         // Caso: 2 bytes por componente (RGB) en formato little-endian
         imagen.redChannel = std::vector<uint16_t>(num_pixels);
         imagen.greenChannel = std::vector<uint16_t>(num_pixels);
         imagen.blueChannel = std::vector<uint16_t>(num_pixels);
-        leerCanales16Bits(archivo, imagen, num_pixels, metadata.max_value);
+        leerCanales16Bits(archivo, num_pixels, imagen, metadata.max_value);
     }
     return imagen;
 }
@@ -191,9 +193,8 @@ ImageSOA cargarImagenPPMtoSOA(const std::string& nombre_archivo, PPMMetadata& me
  */
 int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, const int maxLevel, const std::string& outputPath) {
     std::ofstream outFile(outputPath, std::ios::binary);
-    if (!outFile.is_open()) {
-        std::cerr << "No se pudo abrir el archivo de salida" << '\n';
-        return 1;
+    if (!outFile.is_open() || outputPath.substr(outputPath.size() - 4) != ".ppm") {
+        throw std::runtime_error("No se pudo abrir el archivo");
     }
     // Check channel sizes
     if (std::holds_alternative<std::vector<uint8_t>>(srcImage.redChannel)) {
@@ -201,9 +202,11 @@ int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, const in
         auto greenChannel = std::get<std::vector<uint8_t>>(srcImage.greenChannel);
         auto blueChannel = std::get<std::vector<uint8_t>>(srcImage.blueChannel);
         // Verificar que los canales tengan el mismo tamaño
-        if (redChannel.size() != greenChannel.size() || greenChannel.size() != blueChannel.size()) {
-            std::cerr << "Channel sizes do not match!" << '\n';
-            return 1;
+        if (redChannel.size() != greenChannel.size() || greenChannel.size() != blueChannel.size() || metadata.width * metadata.height != redChannel.size()) {
+            throw std::runtime_error("Los tamaños de los canales no coinciden");
+        }
+        if (maxLevel > METATADATA_MAX_VALUE || maxLevel < 0) {
+            throw std::runtime_error("Nivel máximo de intensidad no soportado");
         }
         writePPMHeader(outFile, metadata, maxLevel);
         ColorChannels8 const channels8{.red=redChannel, .green=greenChannel, .blue=blueChannel};
@@ -213,16 +216,17 @@ int saveSOAtoPPM(const ImageSOA& srcImage, const PPMMetadata& metadata, const in
         auto greenChannel = std::get<std::vector<uint16_t>>(srcImage.greenChannel);
         auto blueChannel = std::get<std::vector<uint16_t>>(srcImage.blueChannel);
         // Verificar que los canales tengan el mismo tamaño
-        if (redChannel.size() != greenChannel.size() || greenChannel.size() != blueChannel.size()) {
-            std::cerr << "Channel sizes do not match!" << '\n';
-            return 1;
+        if (redChannel.size() != greenChannel.size() || greenChannel.size() != blueChannel.size() || metadata.width * metadata.height != redChannel.size()) {
+            throw std::runtime_error("Los tamaños de los canales no coinciden");
+        }
+        if (maxLevel > MAX_COLOR_VALUE_16 || maxLevel <= METATADATA_MAX_VALUE) {
+            throw std::runtime_error("Nivel máximo de intensidad no soportado");
         }
         writePPMHeader(outFile, metadata, maxLevel);
         ColorChannels16 const channels16{.red=redChannel, .green=greenChannel, .blue=blueChannel};
         writePixelData16(outFile, channels16);
     } else {
-        std::cerr << "Unsupported pixel format!" << '\n';
-        return 1;
+        throw std::runtime_error("Formato de píxeles no soportado");
     }
     outFile.close();
     std::cout << "La imagen con el nuevo nivel máximo de intensidad se ha guardado en " << outputPath << '\n';

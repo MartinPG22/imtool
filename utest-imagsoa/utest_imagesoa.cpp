@@ -231,4 +231,250 @@ TEST(CargarImagenPPMtoSOATest, RGBChannelsIncorrect16) {
     EXPECT_THROW(cargarImagenPPMtoSOA("archivo.ppm", metadata), std::runtime_error);
 }
 
+/**
+ * @brief Test for saveSOAtoPPMTest function.
+ *
+ * This test verifies that the saveSOAtoPPMTest function correctly handles the case when the file
+ * is not found.
+ */
+TEST(saveSOAtoPPMTest, FileNotFound) {
+    ImageSOA const testImage{
+        .redChannel = std::vector<uint8_t>{u_255, u_0, u_0},
+        .greenChannel = std::vector<uint8_t>{u_0, u_255, u_0},
+        .blueChannel = std::vector<uint8_t>{u_0, u_0, u_255}
+    };
+    PPMMetadata const testMetadata{
+        .width = 1,
+        .height = 3,
+        .max_value = 255,
+    };
+    int const maxLevel = 255;
+    std::string const invalidPath = "no_existe.pp";
+    EXPECT_THROW(saveSOAtoPPM(testImage, testMetadata, maxLevel, invalidPath), std::runtime_error);
+}
 
+/**
+ * @brief Test for saveSOAtoPPMTest function.
+ *
+ * This test verifies that the saveSOAtoPPMTest function correctly handles the case when the SOA
+ * image channels have different sizes.
+ */
+TEST(SaveSOAToPPMTests, MismatchedChannelSizes) {
+    // Entradas: Canales de diferentes tamaños
+    ImageSOA const testImage{
+        .redChannel = std::vector<uint8_t>{u_255, u_0, u_0},
+        .greenChannel = std::vector<uint8_t>{u_0, u_255},
+        .blueChannel = std::vector<uint8_t>{u_0, u_0, u_255}
+    };
+    PPMMetadata const testMetadata{
+        .width = 1,
+        .height = 3,
+        .max_value = 255,
+    };
+    int const maxLevel = 255;
+    std::string const outputPath = "test_output.ppm";
+    // Ejecutar la función
+    EXPECT_THROW(saveSOAtoPPM(testImage, testMetadata, maxLevel, outputPath), std::runtime_error);
+}
+
+/**
+ * @brief Test for saveSOAtoPPMTest function.
+ *
+ * This test verifies that the saveSOAtoPPMTest function correctly saves the SOA image to a PPM file.
+ */
+TEST(SaveSOAToPPMTests, ValidImageUint8) {
+    ImageSOA const testImage{
+        .redChannel = std::vector<uint8_t>{u_255, u_1, u_1},
+        .greenChannel = std::vector<uint8_t>{u_1, u_255, u_1},
+        .blueChannel = std::vector<uint8_t>{u_1, u_1, u_255}
+    };
+    PPMMetadata const testMetadata{
+        .width = 1,
+        .height = 3,
+        .max_value = 255,
+    };
+    int const maxLevel = 255;
+    std::string const outputPath = "test_output.ppm";
+
+    // Ejecutar la función
+    int const result = saveSOAtoPPM(testImage, testMetadata, maxLevel, outputPath);
+
+    // Validar retorno
+    EXPECT_EQ(result, 0); // La función debe retornar 0
+    // Verificar que el archivo fue creado
+    std::ifstream outputFile(outputPath, std::ios::binary);
+    ASSERT_TRUE(outputFile.is_open()) << "El archivo PPM no fue creado correctamente.";
+    // Leer y verificar contenido del archivo
+    std::stringstream fileBuffer;
+    fileBuffer << outputFile.rdbuf();
+    std::string const fileContent = fileBuffer.str();
+    outputFile.close();
+    // Validar cabecera
+    std::string const expectedHeader = "P6\n3 1\n255\n";
+    ASSERT_EQ(fileContent.find(expectedHeader), std::string::npos) << "Cabecera PPM incorrecta.";
+    // Validar datos de píxeles
+    std::string const expectedPixels = "\xFF\x01\x01\x01\xFF\x01\x01\x01\x01\xFF\x01\x01\x01\x01\xFF";
+    ASSERT_EQ(fileContent.find(expectedPixels), std::string::npos) << "Datos de píxeles incorrectos.";
+    // Limpiar archivo generado
+    auto res = std::remove(outputPath.c_str());
+    ASSERT_EQ(res, 0) << "No se pudo eliminar el archivo generado.";
+}
+
+/**
+ * @brief Test for saveSOAtoPPMTest function.
+ *
+ * This test verifies that the saveSOAtoPPMTest function correctly saves the SOA image to a PPM file.
+ */
+TEST(SaveSOAToPPMTests, ValidImageUint16) {
+    ImageSOA const testImage{
+        .redChannel = std::vector<uint16_t>{u_65535, u_1, u_1},
+        .greenChannel = std::vector<uint16_t>{u_1, u_65535, u_1},
+        .blueChannel = std::vector<uint16_t>{u_1, u_1, u_65535}
+    };
+    PPMMetadata const testMetadata{
+        .width = 1,
+        .height = 3,
+        .max_value = 65535,
+    };
+    int const maxLevel = 65535;
+    std::string const outputPath = "test_output.ppm";
+    // Ejecutar la función
+    int const result = saveSOAtoPPM(testImage, testMetadata, maxLevel, outputPath);
+
+    // Validar retorno
+    EXPECT_EQ(result, 0); // La función debe retornar 0
+    // Verificar que el archivo fue creado
+    std::ifstream outputFile(outputPath, std::ios::binary);
+    ASSERT_TRUE(outputFile.is_open()) << "El archivo PPM no fue creado correctamente.";
+    // Leer y verificar contenido del archivo
+    std::stringstream fileBuffer;
+    fileBuffer << outputFile.rdbuf();
+    std::string const fileContent = fileBuffer.str();
+    outputFile.close();
+    // Validar cabecera
+    std::string const expectedHeader = "P6\n3 1\n65535\n";
+    ASSERT_EQ(fileContent.find(expectedHeader), std::string::npos) << "Cabecera PPM incorrecta.";
+    // Validar datos de píxeles
+    std::vector<uint16_t> const pixeles = {
+        0xFFFF, 0x0001, 0x0001,
+        0x0001, 0xFFFF, 0x0001,
+        0x0001, 0x0001, 0xFFFF,
+    };
+    std::string expectedPixels;
+    for (uint16_t const pixel : pixeles) {
+        expectedPixels.push_back(static_cast<char>(pixel & MAX_COLOR_VALUE));         // Byte bajo (little-endian)
+        expectedPixels.push_back(static_cast<char>((pixel >> BYTE_SIZE) & MAX_COLOR_VALUE));  // Byte alto (little-endian)
+    }
+    ASSERT_EQ(fileContent.find(expectedPixels), std::string::npos) << "Datos de píxeles incorrectos.";
+    // Limpiar archivo generado
+    auto res = std::remove(outputPath.c_str());
+    ASSERT_EQ(res, 0) << "No se pudo eliminar el archivo generado.";
+}
+
+/**
+ * @brief Test for saveSOAtoPPMTest function.
+ *
+ * This test verifies that the saveSOAtoPPMTest function correctly saves the SOA image with a valid PPM header.
+ */
+TEST(SaveSOAToPPMTests, CorrectHeader) {
+    ImageSOA const testImage{
+        .redChannel = std::vector<uint16_t>{u_65535, u_1, u_1},
+        .greenChannel = std::vector<uint16_t>{u_1, u_65535, u_1},
+        .blueChannel = std::vector<uint16_t>{u_1, u_1, u_65535}
+    };
+    PPMMetadata const testMetadata{
+        .width = 1,
+        .height = 3,
+        .max_value = 65535,
+    };
+    int const maxLevel = 65535;
+    std::string const outputPath = "test_output.ppm";
+    // Ejecutar la función
+    int const result = saveSOAtoPPM(testImage, testMetadata, maxLevel, outputPath);
+
+    // Validar retorno
+    EXPECT_EQ(result, 0); // La función debe retornar 0
+    // Verificar que el archivo fue creado
+    std::ifstream outputFile(outputPath, std::ios::binary);
+    ASSERT_TRUE(outputFile.is_open()) << "El archivo PPM no fue creado correctamente.";
+    // Leer y verificar contenido del archivo
+    std::stringstream fileBuffer;
+    fileBuffer << outputFile.rdbuf();
+    std::string const fileContent = fileBuffer.str();
+    outputFile.close();
+    // Validar cabecera
+    std::string const expectedHeader = "P6\n3 1\n65535\n";
+    ASSERT_EQ(fileContent.find(expectedHeader), std::string::npos) << "Cabecera PPM incorrecta.";
+    // Limpiar archivo generado
+    auto res = std::remove(outputPath.c_str());
+    ASSERT_EQ(res, 0) << "No se pudo eliminar el archivo generado.";
+}
+
+/**
+ * @brief Test for saveSOAtoPPMTest function.
+ *
+ * This test verifies that the saveSOAtoPPMTest function correctly handles the case when the file
+ * max_value in the metadata does not match.
+ */
+TEST(SaveSOAToPPMTests, MaxValueInconsistent) {
+    ImageSOA const testImage{
+        .redChannel = std::vector<uint16_t>{u_65535, u_1, u_1},
+        .greenChannel = std::vector<uint16_t>{u_1, u_65535, u_1},
+        .blueChannel = std::vector<uint16_t>{u_1, u_1, u_65535}
+    };
+    PPMMetadata const testMetadata{
+        .width = 1,
+        .height = 3,
+        .max_value = 100,
+    };
+    int const maxLevel = 100;  // Valor máximo de intensidad inconsistente
+
+    // La función debe devolver un error debido al valor inconsistente de maxLevel
+    EXPECT_THROW(saveSOAtoPPM(testImage, testMetadata, maxLevel, "test_output.ppm");, std::runtime_error);
+}
+
+/**
+ * @brief Test for saveSOAtoPPMTest function.
+ *
+ * This test verifies that the saveSOAtoPPMTest function correctly handles the case when the file
+ * dimensions in the metadata does not match.
+ */
+TEST(SaveSOAToPPMTests, DimInconsistentMax) {
+    ImageSOA const testImage{
+        .redChannel = std::vector<uint16_t>{u_65535, u_1},
+        .greenChannel = std::vector<uint16_t>{u_1, u_65535},
+        .blueChannel = std::vector<uint16_t>{u_1, u_1}
+    };
+    PPMMetadata const testMetadata{
+        .width = 1,
+        .height = 3,
+        .max_value = 65535,
+    };
+    int const maxLevel = 65535;  // Valor máximo válido
+
+    // La función debe devolver un error porque el número de píxeles no coincide con las dimensiones
+    EXPECT_THROW(saveSOAtoPPM(testImage, testMetadata, maxLevel, "test_output.ppm");, std::runtime_error);
+}
+
+/**
+ * @brief Test for saveSOAtoPPMTest function.
+ *
+ * This test verifies that the saveSOAtoPPMTest function correctly handles the case when the file
+ * dimensions in the metadata does not match.
+ */
+TEST(SaveSOAToPPMTests, DimInconsistentMin) {
+    ImageSOA const testImage{
+        .redChannel = std::vector<uint16_t>{u_65535, u_1, u_1},
+        .greenChannel = std::vector<uint16_t>{u_1, u_65535, u_1},
+        .blueChannel = std::vector<uint16_t>{u_1, u_1, u_65535}
+    };
+    PPMMetadata const testMetadata{
+        .width = 1,
+        .height = 2,
+        .max_value = 65535,
+    };
+    int const maxLevel = 65535;  // Valor máximo válido
+
+    // La función debe devolver un error porque el número de píxeles no coincide con las dimensiones
+    EXPECT_THROW(saveSOAtoPPM(testImage, testMetadata, maxLevel, "test_output.ppm");, std::runtime_error);
+}
