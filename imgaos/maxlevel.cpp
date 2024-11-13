@@ -22,12 +22,12 @@
  */
 ImageAOS maxlevelAOS(const ImageAOS &srcImage, const PPMMetadata &metadata, const int newMaxLevel,
                      const std::string &outputPath) {
-    if (newMaxLevel <= 0) {
+    if (newMaxLevel <= 0 || newMaxLevel > MAX_COLOR_VALUE_16) {
         throw std::runtime_error("Invalid max level");
     }
     ImageAOS max_level_AOS;
-    // Cambiar el nivel máximo de los píxeles
-    if (std::holds_alternative<std::vector<Pixel8>>(srcImage.pixels)) {
+    // Caso 1: Píxeles de 8-bit y nuevo nivel máximo de intensidad 8-bit
+    if (std::holds_alternative<std::vector<Pixel8>>(srcImage.pixels) && newMaxLevel <= MAX_COLOR_VALUE) {
         const auto& srcPixels = std::get<std::vector<Pixel8>>(srcImage.pixels);
         if (metadata.width * metadata.height != srcPixels.size()) {
             throw std::runtime_error("Invalid number of pixels");
@@ -40,7 +40,8 @@ ImageAOS maxlevelAOS(const ImageAOS &srcImage, const PPMMetadata &metadata, cons
             out_pixels[index].b = static_cast<uint8_t>(b * newMaxLevel / metadata.max_value);
         }
         max_level_AOS.pixels = std::move(out_pixels);
-    } else if (std::holds_alternative<std::vector<Pixel16>>(srcImage.pixels)) {
+    // Caso 2: Píxeles de 16-bit y nuevo nivel máximo de intensidad 16-bit
+    } else if (std::holds_alternative<std::vector<Pixel16>>(srcImage.pixels) && newMaxLevel > MAX_COLOR_VALUE) {
         const auto& srcPixels = std::get<std::vector<Pixel16>>(srcImage.pixels);
         std::vector<Pixel16> out_pixels(srcPixels.size());
         for (size_t index = 0; index < srcPixels.size(); ++index) {
@@ -48,6 +49,28 @@ ImageAOS maxlevelAOS(const ImageAOS &srcImage, const PPMMetadata &metadata, cons
             out_pixels[index].r = static_cast<uint16_t>(r * newMaxLevel / metadata.max_value);
             out_pixels[index].g = static_cast<uint16_t>(g * newMaxLevel / metadata.max_value);
             out_pixels[index].b = static_cast<uint16_t>(b * newMaxLevel / metadata.max_value);
+        }
+        max_level_AOS.pixels = std::move(out_pixels);
+    // Caso 3: Píxeles de 8-bit y nuevo nivel máximo de intensidad 16-bit
+    } else if (std::holds_alternative<std::vector<Pixel8>>(srcImage.pixels) && newMaxLevel > MAX_COLOR_VALUE) {
+        const auto& srcPixels = std::get<std::vector<Pixel8>>(srcImage.pixels);
+        std::vector<Pixel16> out_pixels(srcPixels.size());
+        for (size_t index = 0; index < srcPixels.size(); ++index) {
+            const auto& [r, g, b] = srcPixels[index];
+            out_pixels[index].r = static_cast<uint16_t>(r * newMaxLevel / metadata.max_value);
+            out_pixels[index].g = static_cast<uint16_t>(g * newMaxLevel / metadata.max_value);
+            out_pixels[index].b = static_cast<uint16_t>(b * newMaxLevel / metadata.max_value);
+        }
+        max_level_AOS.pixels = std::move(out_pixels);
+    // Caso 4: Píxeles de 16-bit y nuevo nivel máximo de intensidad 8-bit
+    } else if (std::holds_alternative<std::vector<Pixel16>>(srcImage.pixels) && newMaxLevel <= MAX_COLOR_VALUE) {
+        const auto& srcPixels = std::get<std::vector<Pixel16>>(srcImage.pixels);
+        std::vector<Pixel8> out_pixels(srcPixels.size());
+        for (size_t index = 0; index < srcPixels.size(); ++index) {
+            const auto& [r, g, b] = srcPixels[index];
+            out_pixels[index].r = static_cast<uint8_t>(r * newMaxLevel / metadata.max_value);
+            out_pixels[index].g = static_cast<uint8_t>(g * newMaxLevel / metadata.max_value);
+            out_pixels[index].b = static_cast<uint8_t>(b * newMaxLevel / metadata.max_value);
         }
         max_level_AOS.pixels = std::move(out_pixels);
     } else {

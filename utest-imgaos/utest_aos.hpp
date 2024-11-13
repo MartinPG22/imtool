@@ -33,13 +33,20 @@ constexpr int n_65535 = 65535;
 constexpr uint8_t u_0 = 0;
 constexpr uint8_t u_25 = 25;
 constexpr uint8_t u_50 = 50;
+constexpr uint8_t u_63 = 63;
 constexpr uint8_t u_64 = 64;
 constexpr uint8_t u_100 = 100;
+constexpr uint8_t u_127 = 127;
 constexpr uint8_t u_128 = 128;
 constexpr uint8_t u_255 = 255;
 constexpr uint16_t u_16384 = 16384;
 constexpr uint16_t u_32768 = 32768;
 constexpr uint16_t u_65535 = 65535;
+constexpr uint16_t u_7500 = 7500;
+constexpr uint16_t u_30000 = 30000;
+constexpr uint16_t u_15000 = 15000;
+constexpr uint16_t u_16448 = 16448;
+constexpr uint16_t u_32896 = 32896;
 
 template <typename T>
 bool colorsAreEqual(const Color<T>& color1, const Color<T>& color2);
