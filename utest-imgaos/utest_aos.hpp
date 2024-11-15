@@ -68,4 +68,6 @@ std::string getFileName16();
 std::string getOutputPath();
 void SetUpTestFiles();
 void TearDownTestFiles();
+bool leerEncabezadoPPM(std::ifstream& archivo, PPMMetadata& metadata);
+void validarPixeles16(const std::vector<Pixel16>& pixels16);
 #endif //UTEST_AOS_HPP
