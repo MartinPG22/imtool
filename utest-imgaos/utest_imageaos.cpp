@@ -120,53 +120,30 @@ TEST(CargarPixelsTest, cargarPixels8CargaCorrectamente) {
 
     archivo.close();
 }
-// Función auxiliar para leer el encabezado PPM
-bool leerEncabezadoPPM(std::ifstream& archivo, PPMMetadata& metadata) {
-    std::string magicNumber;
-    archivo >> magicNumber;
-    if (magicNumber != "P6") {
-        return false; // No es un archivo PPM válido
-    }
 
-    archivo >> metadata.width >> metadata.height >> metadata.max_value;
-    archivo.ignore();  // Ignorar el salto de línea después del encabezado
-    return true;
-}
-// Función auxiliar para validar los valores de los píxeles
-void validarPixeles16(const std::vector<Pixel16>& pixels16) {
-    // Verificar los valores de los píxeles leídos
-    EXPECT_EQ(pixels16[0].r, 25600);
-    EXPECT_EQ(pixels16[0].g, 38400);
-    EXPECT_EQ(pixels16[0].b, 51200);
-
-    EXPECT_EQ(pixels16[1].r, 12800);
-    EXPECT_EQ(pixels16[1].g, 25600);
-    EXPECT_EQ(pixels16[1].b, 38400);
-
-    EXPECT_EQ(pixels16[2].r, 0);
-    EXPECT_EQ(pixels16[2].g, 0);
-    EXPECT_EQ(pixels16[2].b, 0);
-
-    EXPECT_EQ(pixels16[3].r, 65535);
-    EXPECT_EQ(pixels16[3].g, 65535);
-    EXPECT_EQ(pixels16[3].b, 65535);
-}
-// Test refactorizado
+// Prueba de cargarPixels16 para cargar correctamente un archivo PPM de 16 bits
 TEST(CargarPixelsTest, cargarPixels16CargaCorrectamente) {
     SetUpTestFiles();
 
     // Abrir el archivo de 16 bits para leer
     std::ifstream archivo(getFileName16(), std::ios::binary);
 
-    // Leer el encabezado
+    // Leer y mostrar el encabezado
+    std::string magicNumber;
+    archivo >> magicNumber;  // Leer "P6"
+    ASSERT_EQ(magicNumber, "P6");
+    std::cerr << "Magic Number: " << magicNumber << '\n';  // Verificar que es "P6"
+
     PPMMetadata metadata{};
-    ASSERT_TRUE(leerEncabezadoPPM(archivo, metadata));
+    archivo >> metadata.width >> metadata.height >> metadata.max_value;
+
+    archivo.ignore();  // Ignorar el salto de línea después del encabezado
 
     // Leer las primeras tres líneas para ver cómo están siendo leídas
-    archivo.clear();
-    archivo.seekg(0, std::ios::beg);
+    archivo.clear();  // Limpiar cualquier estado de error si es que ha habido uno
+    archivo.seekg(0, std::ios::beg);  // Ir al principio del archivo
+    std::string line;
     for (int i = 0; i < 3; ++i) {
-        std::string line;
         std::getline(archivo, line);
     }
 
@@ -182,12 +159,26 @@ TEST(CargarPixelsTest, cargarPixels16CargaCorrectamente) {
     // Comprobar que se han leído 4 píxeles (en este caso de 2x2)
     ASSERT_EQ(pixels16.size(), 4);
 
-    // Validar los valores de los píxeles
-    validarPixeles16(pixels16);
+    // Comprobar que los valores de los píxeles leídos coinciden con los valores esperados
+    EXPECT_EQ(pixels16[0].r, 25600); // Verifica el valor rojo del primer píxel
+    EXPECT_EQ(pixels16[0].g, 38400); // Verifica el valor verde del primer píxel
+    EXPECT_EQ(pixels16[0].b, 51200); // Verifica el valor azul del primer píxel
+
+    // Comprobar que los valores de los píxeles leídos coinciden con los valores esperados
+    EXPECT_EQ(pixels16[1].r, 12800); // Verifica el valor rojo del primer píxel
+    EXPECT_EQ(pixels16[1].g, 25600); // Verifica el valor verde del primer píxel
+    EXPECT_EQ(pixels16[1].b, 38400); // Verifica el valor azul del primer píxel
+
+    EXPECT_EQ(pixels16[2].r, 0); // Verifica el valor rojo del último píxel (máximo valor para 16 bits)
+    EXPECT_EQ(pixels16[2].g, 0); // Verifica el valor verde del último píxel (máximo valor para 16 bits)
+    EXPECT_EQ(pixels16[2].b, 0); // Verifica el valor azul del último píxel (máximo valor para 16 bits)
+
+    EXPECT_EQ(pixels16[3].r, 65535); // Verifica el valor rojo del último píxel (máximo valor para 16 bits)
+    EXPECT_EQ(pixels16[3].g, 65535); // Verifica el valor verde del último píxel (máximo valor para 16 bits)
+    EXPECT_EQ(pixels16[3].b, 65535); // Verifica el valor azul del último píxel (máximo valor para 16 bits)
 
     archivo.close();
 }
-
 
 // Prueba de cargarImagenPPMAOS para leer correctamente archivos PPM en formato AOS
 TEST(CargarImagenPPMAOSTest, cargarImagenPPMAOSCargaCorrectamente) {
