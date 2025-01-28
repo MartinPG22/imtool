@@ -59,20 +59,21 @@ make
 
 To execute the application, use the following format:
 
-bash
+````bash
 ./imtool-<soa|aos> <input.ppm> <output.ppm> <operation> [parameters]
-
+````
 
 Example usage:
 
-bash
+````bash
 ./imtool-aos input.ppm output.ppm resize 200 150
-
+````
 
 ---
 ## 📊Performance and Energy Evaluation
 
 Performance and energy consumption tests have been conducted on the Avignon cluster using the perf tool.
+
 ---
 ## 🫂Project Members
 
@@ -80,3 +81,4 @@ Performance and energy consumption tests have been conducted on the Avignon clus
 - Amina Errami Maslaoui
 - Martín Portugal González
 - George Jose Hallak Pita
+
