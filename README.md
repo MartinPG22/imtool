@@ -52,3 +52,31 @@ mkdir build
 cd build
 cmake ..
 make
+````
+---
+
+## 🚀Usage
+
+To execute the application, use the following format:
+
+bash
+./imtool-<soa|aos> <input.ppm> <output.ppm> <operation> [parameters]
+
+
+Example usage:
+
+bash
+./imtool-aos input.ppm output.ppm resize 200 150
+
+
+---
+## 📊Performance and Energy Evaluation
+
+Performance and energy consumption tests have been conducted on the Avignon cluster using the perf tool.
+---
+## 🫂Project Members
+
+- Alberto Sánchez del Álamo
+- Amina Errami Maslaoui
+- Martín Portugal González
+- George Jose Hallak Pita
