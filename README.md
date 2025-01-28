@@ -1,81 +1,54 @@
 # 📸 Imtool
 
-**Imtool** es una herramienta de procesamiento de imágenes diseñada para trabajar con imágenes en formato PPM. Desarrollada como parte del curso de Arquitectura de Computadores en la Universidad Carlos III de Madrid, este proyecto se centra en optimizar transformaciones de imágenes utilizando **C++20**. Se exploran dos estrategias diferentes de organización de datos para evaluar su impacto en el rendimiento y la eficiencia energética.
+**Imtool** is an image processing tool designed to work with PPM format images. Developed as part of the Computer Architecture course at Universidad Carlos III de Madrid, this project focuses on optimizing image transformations using **C++20**. It explores two different data organization strategies to evaluate their impact on performance and energy efficiency.
 
 ---
 
-## 🛠️ Implementaciones
+## 🛠️ Implementations
 
-El proyecto incluye dos versiones principales:
+The project includes two main versions:
 
-- **imtool-soa**: Utiliza el enfoque **Structure of Arrays (SOA)**.
-- **imtool-aos**: Utiliza el enfoque **Array of Structures (AOS)**.
+- **imtool-soa**: Uses the **Structure of Arrays (SOA)** approach.
+- **imtool-aos**: Uses the **Array of Structures (AOS)** approach.
 
-Estas implementaciones permiten comparar patrones de acceso a memoria y eficiencia computacional en tareas de procesamiento de imágenes.
-
----
-
-## ✨ Funcionalidades
-
-La aplicación permite realizar las siguientes operaciones en imágenes PPM:
-
-1. **info**: Recupera metadatos de la imagen.
-2. **maxlevel**: Escala el número de niveles de intensidad.
-3. **resize**: Redimensiona la imagen utilizando interpolación bilineal.
-4. **cutfreq**: Elimina los colores menos frecuentes de la imagen.
-5. **compress**: Comprime la imagen utilizando un formato ficticio CPPM.
+These implementations allow for the comparison of memory access patterns and computational efficiency in image processing tasks.
 
 ---
 
-## 📂 Estructura del Proyecto
+## ✨ Features
 
-El proyecto está organizado en varias carpetas para mejorar la modularidad:
+The application supports the following operations on PPM images:
 
-- **`common/`**: Código compartido por ambas implementaciones.
-- **`imgsoa/`**: Código específico de la versión SOA.
-- **`imgaos/`**: Código específico de la versión AOS.
-- **`utest-common/`**: Pruebas unitarias para la biblioteca común.
-- **`utest-imgsoa/`**: Pruebas unitarias para la biblioteca SOA.
-- **`utest-imgaos/`**: Pruebas unitarias para la biblioteca AOS.
-- **`ftest-soa/`**: Pruebas funcionales para imtool-soa.
-- **`ftest-aos/`**: Pruebas funcionales para imtool-aos.
-- **`imagesPPM/`**: Imágenes de prueba en formato PPM.
+1. **info**: Retrieves image metadata.
+2. **maxlevel**: Scales the number of intensity levels.
+3. **resize**: Resizes the image using bilinear interpolation.
+4. **cutfreq**: Removes the least frequent colors from the image.
+5. **compress**: Compresses the image using a fictional CPPM format.
 
 ---
 
-## 🏗️ Compilación e Instalación
+## 📂 Project Structure
 
-El proyecto utiliza **CMake** para la compilación. Para compilar el proyecto, ejecuta los siguientes comandos desde la raíz del proyecto:
+The project is organized into several folders to improve modularity:
+
+- **`common/`**: Code shared by both implementations.
+- **`imgsoa/`**: Code specific to the SOA version.
+- **`imgaos/`**: Code specific to the AOS version.
+- **`utest-common/`**: Unit tests for the common library.
+- **`utest-imgsoa/`**: Unit tests for the SOA library.
+- **`utest-imgaos/`**: Unit tests for the AOS library.
+- **`ftest-soa/`**: Functional tests for imtool-soa.
+- **`ftest-aos/`**: Functional tests for imtool-aos.
+- **`imagesPPM/`**: Test images in PPM format.
+
+---
+
+## 🏗️ Compilation and Installation
+
+The project uses **CMake** for compilation. To compile the project, run the following commands from the project root:
 
 ```bash
 mkdir build
 cd build
 cmake ..
 make
-```
-
----
-
-## 🚀Usage
-
-To execute the application, use the following format:
-```bash
-./imtool-<soa|aos> <input.ppm> <output.ppm> <operation> [parameters]
-```
-Example usage:
-```bash
-./imtool-aos input.ppm output.ppm resize 200 150
-````
----
-## 📊Performance and Energy Evaluation
-
-Performance and energy consumption tests have been conducted on the Avignon cluster using the perf tool.
----
-## 🫂Project Members
-
-- Alberto Sánchez del Álamo
-- Amina Errami Maslaoui
-- Martín Portugal González
-- George Jose Hallak Pita
-
-
